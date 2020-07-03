@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ReusableAnswerCell" rowHeight="80" translatesAutoresizingMaskIntoConstraints="NO" id="KGk-i7-Jjw" customClass="answerCell" customModule="eduMates" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="415" height="60"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="415" height="60"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="VCg-vi-Rvz">
+                        <rect key="frame" x="66" y="8" width="294" height="44"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                        <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="10"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
+                        </userDefinedRuntimeAttributes>
+                    </textView>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="answerLogo" translatesAutoresizingMaskIntoConstraints="NO" id="PhB-ES-njQ">
+                        <rect key="frame" x="360" y="5" width="50" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="50" id="f2g-xs-qE5"/>
+                            <constraint firstAttribute="height" constant="50" id="vHB-aT-0wd"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <color key="backgroundColor" red="0.0" green="0.1526907988" blue="0.22812766879999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                <constraints>
+                    <constraint firstItem="VCg-vi-Rvz" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="66" id="Kq2-7G-2H6"/>
+                    <constraint firstItem="VCg-vi-Rvz" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="Nud-Lv-xa6"/>
+                    <constraint firstAttribute="bottom" secondItem="VCg-vi-Rvz" secondAttribute="bottom" constant="8" id="ecN-a7-7HH"/>
+                    <constraint firstAttribute="trailing" secondItem="VCg-vi-Rvz" secondAttribute="trailing" constant="55" id="g82-ck-VAM"/>
+                    <constraint firstAttribute="trailing" secondItem="PhB-ES-njQ" secondAttribute="trailing" constant="5" id="wks-aI-mCL"/>
+                    <constraint firstItem="PhB-ES-njQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="zgd-AQ-0JM"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="label" destination="VCg-vi-Rvz" id="1Wn-Lx-mhQ"/>
+                <outlet property="leftImageView" destination="PhB-ES-njQ" id="iu9-o1-gZc"/>
+            </connections>
+            <point key="canvasLocation" x="-229.71014492753625" y="103.45982142857143"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="answerLogo" width="21" height="21"/>
+    </resources>
+</document>

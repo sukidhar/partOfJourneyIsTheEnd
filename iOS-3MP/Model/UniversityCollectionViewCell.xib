@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="card" translatesAutoresizingMaskIntoConstraints="NO" id="gTV-IL-0wX" customClass="UniversityCollectionViewCell" customModule="eduMates" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="150" height="225"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="150" height="225"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6e3-Oo-Jdl">
+                        <rect key="frame" x="0.0" y="0.0" width="150" height="225"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lCb-PD-RgC">
+                                <rect key="frame" x="10" y="10" width="130" height="130"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tbn-UA-DDv">
+                                        <rect key="frame" x="0.0" y="0.0" width="130" height="130"/>
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="placeholder" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GPX-SE-XMA">
+                                                <rect key="frame" x="5" y="5" width="120" height="120"/>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="GPX-SE-XMA" secondAttribute="bottom" constant="5" id="494-ci-Ovr"/>
+                                            <constraint firstAttribute="trailing" secondItem="GPX-SE-XMA" secondAttribute="trailing" constant="5" id="X8y-fv-p2D"/>
+                                            <constraint firstItem="GPX-SE-XMA" firstAttribute="top" secondItem="tbn-UA-DDv" secondAttribute="top" constant="5" id="YXk-OE-c7Y"/>
+                                            <constraint firstItem="GPX-SE-XMA" firstAttribute="leading" secondItem="tbn-UA-DDv" secondAttribute="leading" constant="5" id="tAQ-ko-aB1"/>
+                                            <constraint firstItem="GPX-SE-XMA" firstAttribute="centerX" secondItem="tbn-UA-DDv" secondAttribute="centerX" id="yvI-Kq-hGU"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="lCb-PD-RgC" secondAttribute="height" multiplier="1:1" id="B4y-ji-Mx0"/>
+                                    <constraint firstAttribute="trailing" secondItem="tbn-UA-DDv" secondAttribute="trailing" id="C61-zQ-wFG"/>
+                                    <constraint firstItem="tbn-UA-DDv" firstAttribute="top" secondItem="lCb-PD-RgC" secondAttribute="top" id="Wxf-Nm-f75"/>
+                                    <constraint firstItem="tbn-UA-DDv" firstAttribute="leading" secondItem="lCb-PD-RgC" secondAttribute="leading" id="c9G-Sm-0kB"/>
+                                    <constraint firstAttribute="bottom" secondItem="tbn-UA-DDv" secondAttribute="bottom" id="nuz-8n-z0Y"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="University Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mpk-yB-Zh1">
+                                <rect key="frame" x="0.0" y="162" width="150" height="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="lCb-PD-RgC" secondAttribute="trailing" constant="10" id="2lm-ho-zco"/>
+                            <constraint firstItem="Mpk-yB-Zh1" firstAttribute="leading" secondItem="6e3-Oo-Jdl" secondAttribute="leading" id="J58-ux-zJr"/>
+                            <constraint firstItem="lCb-PD-RgC" firstAttribute="leading" secondItem="6e3-Oo-Jdl" secondAttribute="leading" constant="10" id="OTK-Bv-Z9h"/>
+                            <constraint firstAttribute="bottom" secondItem="Mpk-yB-Zh1" secondAttribute="bottom" constant="45" id="Qsm-lo-O5Z"/>
+                            <constraint firstItem="lCb-PD-RgC" firstAttribute="top" secondItem="6e3-Oo-Jdl" secondAttribute="top" constant="10" id="hN3-LU-JDU"/>
+                            <constraint firstItem="Mpk-yB-Zh1" firstAttribute="centerX" secondItem="6e3-Oo-Jdl" secondAttribute="centerX" id="wvH-fo-jDp"/>
+                        </constraints>
+                    </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IFB-h3-zLf">
+                        <rect key="frame" x="0.0" y="0.0" width="23.5" height="35"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="35" id="GI9-lO-5Xy"/>
+                            <constraint firstAttribute="width" secondItem="IFB-h3-zLf" secondAttribute="height" multiplier="1:1.5" id="mU6-wI-I7K"/>
+                        </constraints>
+                    </button>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Icon awesome-bookmark" translatesAutoresizingMaskIntoConstraints="NO" id="MXD-Cr-afn">
+                        <rect key="frame" x="0.0" y="0.0" width="23.5" height="35"/>
+                    </imageView>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="width" constant="150" id="014-Yz-0Af"/>
+                <constraint firstItem="6e3-Oo-Jdl" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="4t6-DM-Gpu"/>
+                <constraint firstItem="6e3-Oo-Jdl" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="CY8-RX-RUs"/>
+                <constraint firstItem="MXD-Cr-afn" firstAttribute="height" secondItem="IFB-h3-zLf" secondAttribute="height" id="GPX-D1-oQI"/>
+                <constraint firstAttribute="bottom" secondItem="6e3-Oo-Jdl" secondAttribute="bottom" id="GSe-QP-yvN"/>
+                <constraint firstAttribute="trailing" secondItem="6e3-Oo-Jdl" secondAttribute="trailing" id="Hc3-Y5-Ixb"/>
+                <constraint firstItem="MXD-Cr-afn" firstAttribute="width" secondItem="IFB-h3-zLf" secondAttribute="width" multiplier="1.02128" id="Sdp-y1-AvC"/>
+                <constraint firstItem="MXD-Cr-afn" firstAttribute="centerX" secondItem="IFB-h3-zLf" secondAttribute="centerX" id="T4m-XO-kDy"/>
+                <constraint firstItem="MXD-Cr-afn" firstAttribute="centerY" secondItem="IFB-h3-zLf" secondAttribute="centerY" id="XWK-zz-WW7"/>
+                <constraint firstItem="IFB-h3-zLf" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="ewl-Rj-D0S"/>
+                <constraint firstAttribute="height" constant="225" id="n6a-DP-tW5"/>
+                <constraint firstItem="IFB-h3-zLf" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="tYh-Ea-imC"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <size key="customSize" width="180" height="196"/>
+            <connections>
+                <outlet property="containerOfImageVIew" destination="tbn-UA-DDv" id="uuQ-P7-GDd"/>
+                <outlet property="containerVIew" destination="lCb-PD-RgC" id="dwy-zN-fdJ"/>
+                <outlet property="enclosingView" destination="6e3-Oo-Jdl" id="FXQ-YG-jcl"/>
+                <outlet property="featherImage" destination="MXD-Cr-afn" id="AwQ-F0-Jqv"/>
+                <outlet property="imageView" destination="GPX-SE-XMA" id="tt2-ml-HAf"/>
+                <outlet property="starButton" destination="IFB-h3-zLf" id="2vK-Vi-eCH"/>
+                <outlet property="titleLabel" destination="Mpk-yB-Zh1" id="9fo-7n-hZO"/>
+            </connections>
+            <point key="canvasLocation" x="5.7971014492753632" y="115.51339285714285"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="Icon awesome-bookmark" width="48" height="58"/>
+        <image name="placeholder" width="400" height="266.5"/>
+    </resources>
+</document>
