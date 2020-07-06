@@ -36,6 +36,7 @@ class DBAccessor {
     }
     
     func logOut(){
+        Database.database().reference().child("fcmTokens").child(DataService().keyChain.get("uid")!).setValue(nil)
         DataService().keyChain.clear()
         let strongBox = Strongbox()
         strongBox.remove(key: "wishlist")

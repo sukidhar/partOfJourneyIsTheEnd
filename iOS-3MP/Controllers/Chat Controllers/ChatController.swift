@@ -48,8 +48,6 @@ class ChatController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(handleNewChat))
         tableView.register(UserCell.self, forCellReuseIdentifier: "cellId")
         UIBarButtonItem.appearance().tintColor = .black
-        messages.removeAll()
-        messageDictionary.removeAll()
         tableView.reloadData()
         observeUserMessages()
     }
@@ -72,6 +70,7 @@ class ChatController: UITableViewController {
         }
     }
     
+    //MARK: - User is no more paid then to redirect to login screen
     func goToLoginScreen(){
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC")
         self.view.window?.rootViewController = vc
@@ -81,12 +80,15 @@ class ChatController: UITableViewController {
         self.navigationController?.hidesBottomBarWhenPushed = true
         self.tabBarController?.tabBar.isHidden = true
     }
+    
+    //MARK: - reload data whenever view appears because we then can show recent relative tim
     override func viewDidAppear(_ animated: Bool) {
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
     
+    //MARK: - show  chat screen when user clicks on a cell
     func showChatController(rUser: UserModel, for chatID : String ){
         //Responsible for View Controller to go into Chat
         let chatController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
@@ -102,19 +104,15 @@ class ChatController: UITableViewController {
         chatViewController.partners = partners
         navigationController?.pushViewController(chatViewController, animated: true)
     }
-    var messages = [Message]()
-    var messageDictionary = [String: Message]()
     
     
-//  New Methods and Varibales being used
-    
-    
+    //MARK: - Data base query
     var partners = [Partner]()
-    
+    //partner model is for showing user cells
     func observeUserMessages(){
         partners = []
         if let uid = keychain.get("uid"){
-            
+            // continuously observe in real time database value changes, .childAdded wont work here because the current childs are only changed and might be added with a new child
             let db = Database.database().reference().child("userChats").child(uid)
             db.observe(.value) { (snapshot) in
                 for child in snapshot.children.allObjects as! [DataSnapshot]{
@@ -125,6 +123,7 @@ class ChatController: UITableViewController {
                         let latest = data["latest"] as! String
                         let name = data["name"] as! String
                     let newPartner = Partner(id: partnerID, chatID: chatID, lastActive: lastActive, latest: latest, name: name)
+                    //incase we already have the child then change the content of the child
                     if self.partners.contains(where: { (partner) -> Bool in
                         return partner.id == child.key
                     }){
@@ -134,8 +133,10 @@ class ChatController: UITableViewController {
                         self.partners[index!] = newPartner
                     }
                     else{
+                        //else just append the new child into partners
                          self.partners.append(newPartner)
                     }
+                    //reload the table view once this is done
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }
@@ -144,9 +145,10 @@ class ChatController: UITableViewController {
             }
         }
     }
-
+    //MARK: - Table View data source methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         partners.sort { (partner1, partner2) -> Bool in
+            //sort the data retrived based on time stamps just before they are loaded
             let timeDifference = partner1.lastActive - partner2.lastActive
             return timeDifference > 0
         }
@@ -154,12 +156,13 @@ class ChatController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        //default height of cell to be 72
         return 72
-    
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let partner = partners[indexPath.row]
+        //chat user has been selected so the chat log controller will be shown from here after the fetching of minimal data is done
         Firestore.firestore().collection("USER").document(partner.id).getDocument { (snap, error) in
             if let error = error {
                 print(error.localizedDescription)
@@ -176,7 +179,7 @@ class ChatController: UITableViewController {
             }
         }
     }
-    
+    // cell for each partner
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UserCell
         cell.partner = partners[indexPath.row]

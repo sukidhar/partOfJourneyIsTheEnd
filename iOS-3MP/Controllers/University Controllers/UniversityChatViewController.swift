@@ -32,19 +32,13 @@ class UniversityChatViewController: UIViewController {
         if let storyboard = self.storyboard{
             
             let first = storyboard.instantiateViewController(withIdentifier: "Ambassadors") as! AmbassadorsViewController
-            let third = storyboard.instantiateViewController(withIdentifier: "Ambassadors") as! AmbassadorsViewController
             let second = storyboard.instantiateViewController(withIdentifier: "Ambassadors") as! AmbassadorsViewController
-            let fourth = storyboard.instantiateViewController(withIdentifier: "Ambassadors") as! AmbassadorsViewController
-            first.title = "Ambassadors"
-            second.title = "Students"
-            third.title = "Representatives"
-            fourth.title = "EduMates Expert"
+            first.title = "Student Representatives"
+            second.title = "EduMates Expert"
             first.university = university
             second.university = university
-            third.university = university
-            fourth.university = university
             
-            let segmentController = SJSegmentedViewController(headerViewController: nil, segmentControllers: [first,second,third,fourth])
+            let segmentController = SJSegmentedViewController(headerViewController: nil, segmentControllers: [first,second])
             
             self.addChild(segmentController)
             collectionVIewHolder.addSubview(segmentController.view)

@@ -269,11 +269,11 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hXm-WV-dFv">
                                 <rect key="frame" x="0.0" y="158" width="414" height="704"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="25w-lO-9D0">
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" sectionInsetReference="layoutMargins" id="25w-lO-9D0">
                                     <size key="itemSize" width="150" height="225"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="34" minY="25" maxX="20" maxY="15"/>
+                                    <inset key="sectionInset" minX="10" minY="25" maxX="10" maxY="25"/>
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
@@ -372,11 +372,11 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="r8t-2x-gaR">
                                 <rect key="frame" x="0.0" y="158" width="414" height="704"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="45" minimumInteritemSpacing="15" sectionInsetReference="layoutMargins" id="O9z-R9-lOO">
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" sectionInsetReference="layoutMargins" id="O9z-R9-lOO">
                                     <size key="itemSize" width="150" height="225"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="15" minY="10" maxX="15" maxY="10"/>
+                                    <inset key="sectionInset" minX="10" minY="25" maxX="10" maxY="25"/>
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
@@ -1123,7 +1123,7 @@ from current students</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email Address" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4dw-Xb-4cD" customClass="MDCOutlinedTextField">
-                                <rect key="frame" x="50" y="260.5" width="314" height="45"/>
+                                <rect key="frame" x="50" y="255.5" width="314" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="xcP-a0-HbD"/>
                                 </constraints>
@@ -1165,7 +1165,11 @@ from current students</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1S0-Pk-ZAL">
-                                <rect key="frame" x="335" y="350" width="24" height="24"/>
+                                <rect key="frame" x="329" y="346" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="Acb-hm-8JE"/>
+                                    <constraint firstAttribute="width" constant="30" id="azq-oG-IDm"/>
+                                </constraints>
                                 <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
                                 <state key="normal" image="icons8-closed-eye-24"/>
                                 <connections>
@@ -1177,9 +1181,11 @@ from current students</string>
                         <constraints>
                             <constraint firstItem="4dw-Xb-4cD" firstAttribute="centerX" secondItem="7Ml-A6-veb" secondAttribute="centerX" id="0Qg-aJ-AJQ"/>
                             <constraint firstItem="vr8-7l-OGM" firstAttribute="centerY" secondItem="7Ml-A6-veb" secondAttribute="centerY" constant="30" id="2ip-33-NSi"/>
+                            <constraint firstItem="1S0-Pk-ZAL" firstAttribute="trailing" secondItem="L7d-ox-25G" secondAttribute="trailing" constant="-5" id="6my-vm-lhk"/>
                             <constraint firstItem="iNJ-Qe-xPM" firstAttribute="bottom" secondItem="Fms-vI-72q" secondAttribute="bottom" constant="20" id="9ps-Ew-K9h"/>
                             <constraint firstItem="vr8-7l-OGM" firstAttribute="centerX" secondItem="7Ml-A6-veb" secondAttribute="centerX" id="A67-Wr-aCe"/>
-                            <constraint firstItem="4dw-Xb-4cD" firstAttribute="centerY" secondItem="7Ml-A6-veb" secondAttribute="centerY" constant="-165" id="BIl-2w-Re2"/>
+                            <constraint firstItem="1S0-Pk-ZAL" firstAttribute="centerY" secondItem="8xZ-2P-O5o" secondAttribute="centerY" constant="3" id="AAC-20-KXX"/>
+                            <constraint firstItem="4dw-Xb-4cD" firstAttribute="centerY" secondItem="7Ml-A6-veb" secondAttribute="centerY" constant="-170" id="BIl-2w-Re2"/>
                             <constraint firstItem="P83-zX-g7W" firstAttribute="top" secondItem="ar0-bZ-En9" secondAttribute="bottom" constant="8" id="GAY-nB-J0w"/>
                             <constraint firstItem="iNJ-Qe-xPM" firstAttribute="trailing" secondItem="L7d-ox-25G" secondAttribute="trailing" constant="50" id="IgB-0e-DVN"/>
                             <constraint firstItem="Fms-vI-72q" firstAttribute="leading" secondItem="7Ml-A6-veb" secondAttribute="leading" id="LFV-HT-zF6"/>
@@ -1193,10 +1199,8 @@ from current students</string>
                             <constraint firstItem="L7d-ox-25G" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iNJ-Qe-xPM" secondAttribute="leading" symbolic="YES" id="dEa-g8-2Ej"/>
                             <constraint firstItem="ar0-bZ-En9" firstAttribute="centerX" secondItem="7Ml-A6-veb" secondAttribute="centerX" id="hsE-M7-hDU"/>
                             <constraint firstItem="ar0-bZ-En9" firstAttribute="centerY" secondItem="7Ml-A6-veb" secondAttribute="centerY" constant="-290" id="ieY-jS-mgM"/>
-                            <constraint firstItem="iNJ-Qe-xPM" firstAttribute="trailing" secondItem="1S0-Pk-ZAL" secondAttribute="trailing" constant="55" id="jcZ-WB-fOp"/>
                             <constraint firstItem="Fms-vI-72q" firstAttribute="top" secondItem="vr8-7l-OGM" secondAttribute="bottom" constant="30" id="l5S-8f-Q2c"/>
                             <constraint firstAttribute="trailing" secondItem="Fms-vI-72q" secondAttribute="trailing" id="pJQ-CG-nfm"/>
-                            <constraint firstItem="1S0-Pk-ZAL" firstAttribute="centerY" secondItem="8xZ-2P-O5o" secondAttribute="centerY" constant="4" id="q0G-jD-KEA"/>
                             <constraint firstItem="P83-zX-g7W" firstAttribute="centerX" secondItem="7Ml-A6-veb" secondAttribute="centerX" id="uO3-xY-kQV"/>
                             <constraint firstItem="vr8-7l-OGM" firstAttribute="leading" secondItem="iNJ-Qe-xPM" secondAttribute="leading" constant="50" id="vco-UT-3X6"/>
                             <constraint firstItem="L7d-ox-25G" firstAttribute="top" secondItem="8xZ-2P-O5o" secondAttribute="bottom" constant="25" id="vkh-1E-qrR"/>
@@ -2093,7 +2097,7 @@ Our initiative is to add value to students who want to pursue higher education. 
         <!--Tab Bar Controller-->
         <scene sceneID="voL-CR-UNR">
             <objects>
-                <tabBarController storyboardIdentifier="TabBarVC" useStoryboardIdentifierAsRestorationIdentifier="YES" id="X5y-fn-Mmb" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="TabBarVC" useStoryboardIdentifierAsRestorationIdentifier="YES" interfaceStyle="light" id="X5y-fn-Mmb" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="btM-un-n2r">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -2187,16 +2191,6 @@ Our initiative is to add value to students who want to pursue higher education. 
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="c8G-sF-0Es">
-                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="c8G-sF-0Es" id="RiM-8x-Gkf">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="vM0-BE-Hz6" id="or0-sa-XuZ"/>
                             <outlet property="delegate" destination="vM0-BE-Hz6" id="2wk-3F-sh0"/>

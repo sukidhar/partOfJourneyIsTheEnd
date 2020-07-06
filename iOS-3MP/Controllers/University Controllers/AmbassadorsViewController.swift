@@ -23,6 +23,8 @@ class AmbassadorsViewController: UIViewController,UICollectionViewDelegate,UICol
         collectionView.delegate = self
         collectionView.dataSource = self
         loadUsers()
+        loadRepresentatives()
+        
     }
 
     @objc fileprivate func applicationIsActive() {
@@ -63,6 +65,21 @@ class AmbassadorsViewController: UIViewController,UICollectionViewDelegate,UICol
         cell.imageVIew.sd_setImage(with: URL(string: user.imageUrl ?? ""), placeholderImage: #imageLiteral(resourceName: "default"), options: .progressiveLoad)
         return cell
     }
+    
+    func loadRepresentatives(){
+        if let university = university{
+            Database.database().reference().child("ambassadors").child(university.ID).observe(.value) { (snap) in
+                for child in snap.children.allObjects as! [DataSnapshot]{
+                    if child.value as! String == "studentRepresentative" {
+                        
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    
     func loadUsers(){
         users = []
         if let uni = university{

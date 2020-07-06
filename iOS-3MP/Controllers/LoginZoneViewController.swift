@@ -12,6 +12,7 @@ import Strongbox
 import KeychainSwift
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseDatabase
 import Strongbox
 import CoreLocation
 class LoginZoneViewController: UIViewController {
@@ -274,6 +275,7 @@ class LoginZoneViewController: UIViewController {
                     self.keychain.set(self.email, forKey: "email")
                     self.keychain.set(nameComponents[0], forKey: "firstName")
                     self.keychain.set(nameComponents[1], forKey: "lastName")
+                    self.setFcmToken()
                     if self.keychain.getBool("isAmbassador")!{
                         let vc1 = self.storyboard?.instantiateViewController(withIdentifier: "HomeView") as! UINavigationController
                         let uniVC = self.storyboard?.instantiateViewController(withIdentifier: "UniversityPage") as! UniversityViewController
@@ -315,6 +317,11 @@ class LoginZoneViewController: UIViewController {
                     }
                 }
             }
+        }
+    }
+    func setFcmToken(){
+        if let uid = keychain.get("uid"){
+            Database.database().reference().child("fcmToken").child(uid).setValue(UserDefaults.standard.string(forKey: "fcmToken"))
         }
     }
 }

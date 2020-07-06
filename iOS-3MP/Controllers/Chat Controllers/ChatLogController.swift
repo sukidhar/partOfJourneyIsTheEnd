@@ -12,6 +12,8 @@ import KeychainSwift
 
 
 class ChatLogController: UICollectionViewController, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate {
+    
+    //MARK: - Variables
     let db = Database.database().reference()
     var refresher : UIRefreshControl!
     var didSetValues = false
@@ -19,26 +21,31 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     let headerId = "headerView"
     var boxView : UIView!
     var ai : UIActivityIndicatorView!
+    // if we got a user , then set the navigation bar
     var rUser:UserModel? {
         didSet{
             setNavBar()
         }
     }
+    // only if we have chat ID then fetch messages
     var chatID : String?{
         didSet{
            observeChat()
             didSetValues = true
         }
     }
+    // just incase of message is 7 days old or lesser
     private var daysOfTheWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    var previousIndex : Int?
-    var selectedIndex : Int?
     let containerView = UIView()
     var heightConstraintOfContainerView : NSLayoutConstraint!
     var noMoreMessages = false
+    
+    // since the previous page has large titles
     override func viewWillDisappear(_ animated: Bool) {
          self.navigationController?.navigationBar.prefersLargeTitles = true
     }
+    
+    // set the image and name on top bar
     func setNavBar(){
         navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.999904573, green: 1, blue: 0.9998808503, alpha: 1)
         navigationController?.navigationBar.prefersLargeTitles = false
@@ -90,22 +97,28 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         let content : String
         let sender : String
         let timeStamp : Double
+        let recv : String
     }
     
     
     var chatMessages = [NewMessage]()
-    
+    // first query to get 50 messages
     @objc func observeChat(){
         if let id = chatID{
             let chat = db.child("chats").child(id).queryOrderedByKey().queryLimited(toLast: 50)
+            chat.keepSynced(true)
             uploadView()
+            // when the function is about to return if the message count is 0, then it means theres no messages from the given uid. so it will create a notification to set noMoreMessages boolean and also shows the header view
             defer{
                 if chatMessages.count == 0{
                     NotificationCenter.default.post(name: NSNotification.Name("noreMoreMessages"), object: true)
+                   
                 }
             }
             chat.observe(.childAdded) { (snap) in
+                // just before leaving, this helps in knowing how many messages did user get in the first query, if its any less than actual query count, it means user doesnt have any old messages after that fetched count. but if the count == 50, then might be chance of having more messages.
                 defer{
+                    for i in self.chatMessages{print(i)}
                      let actualMessages = self.chatMessages.filter { (message) -> Bool in
                          return message.id != "dateChanged"
                      }
@@ -120,17 +133,24 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     let content = messageData["content"] as! String
                     let sender = messageData["sender"] as! String
                     let timestamp = messageData["timestamp"] as! Double
-                    let message = NewMessage(id: id, content: content.trimmingCharacters(in: .whitespacesAndNewlines)+" ", sender: sender, timeStamp: timestamp)
+                    let recv = messageData["recv"] as? String
+                    let message = NewMessage(id: id, content: content.trimmingCharacters(in: .whitespacesAndNewlines)+" ", sender: sender, timeStamp: timestamp, recv: recv ?? "")
                     self.chatMessages.append(message)
-                    if self.chatMessages.count == 1 {
-                        let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan)
+                    if self.chatMessages.count < 2 {
+                        //adds flag cells that show date on them
+                        let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
                         self.chatMessages.insert(dateLabelingMessage, at: 0)
                     }else {
+                        //adds flag cells that show date on them but the algo here is
+                        // -> if the message timestamp of new message is in date zone of the old message then just append it normally into the message array
+                        //->else add a flag cell just before that message
+                        
                         if !(Date(timeIntervalSince1970: self.chatMessages[self.chatMessages.count-2].timeStamp/1000).shortDate == Date(timeIntervalSince1970: message.timeStamp/1000).shortDate)  {
-                            let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan)
+                            let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
                             self.chatMessages.insert(dateLabelingMessage, at: self.chatMessages.count-1)
                         }
                     }
+                    // reload and scroll to it
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
                         self.collectionView.scrollToItem(at: IndexPath(item: self.chatMessages.count-1, section: 0), at: .bottom, animated: false)
@@ -143,23 +163,28 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     var moreMessages = [NewMessage]()
     
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        //to know if the user scrolled to more on top, the decelarated scroll view bar should stop in that zone to trigger this query
         if scrollView.contentOffset.y < -90 {
             if let id = chatID{
+                //inital query might be missed if the messages count is zero
                 if chatMessages.count == 0{
                     observeChat()
                     return
                 }
+                // incase the initial query set this as true, just return
                 if noMoreMessages{
                     return
                 }
+                //okay all checks are done, now we use the second message from array because first one will be flag cell
                 let mid = chatMessages[1].id
+                //using the taken message id, we will query another 100 messages sorted by key where the query ends with the given message id
                 let chat = Database.database().reference().child("chats").child(id).queryOrderedByKey().queryLimited(toLast: 100).queryEnding(atValue: mid)
                 NotificationCenter.default.post(name: NSNotification.Name("loadingMessages"), object: nil)
                 chat.observe(.childAdded) { (snap) in
                     if let messageData = snap.value as? [String:Any]{
                         let id = snap.key
                         if id == mid{
-                           
+                           // reverse the array and append one by one into actual chat message collection taking care of date flag cells
                             let count = self.moreMessages.count
                             self.moreMessages.reverse()
                             for message in self.moreMessages{
@@ -167,10 +192,11 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                                     self.chatMessages.insert(message, at: 1)
                                 }else{
                                     self.chatMessages.insert(message, at: 0)
-                                    let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan)
+                                    let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
                                     self.chatMessages.insert(dateLabelingMessage, at: 0)
                                 }
                             }
+                            // same check to see if we need to have access for another query
                             DispatchQueue.main.async {
                                 self.collectionView.reloadData()
                                 if count > 5
@@ -183,6 +209,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                                     NotificationCenter.default.post(name: NSNotification.Name("noreMoreMessages"), object: false)
                                 }
                             }
+                            //empty the array once this is fetched and updated
                             self.moreMessages = []
                             return
                         }
@@ -190,7 +217,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                         let sender = messageData["sender"] as! String
                         let timestamp = messageData["timestamp"] as! Double
                         
-                        let message = NewMessage(id: id, content: content + " ", sender: sender, timeStamp: timestamp)
+                        let message = NewMessage(id: id, content: content + " ", sender: sender, timeStamp: timestamp, recv: "")
                         self.moreMessages.append(message)
                     }
                 }
@@ -198,6 +225,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         }
     }
     
+    // reative time literals for the given flag cells timestamp as Date
     func cellContentForTimestamps(for date : Date)->String{
         let calendar = Calendar.current
         if calendar.isDateInYesterday(date){
@@ -217,24 +245,26 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             return date.mediumDate
         }
     }
-    
+    // trigger loader
     @objc func shouldShowLoader(){
         uploadView()
     }
-    
+    // query ended stop loaders and set flags
     @objc func shouldHideLoader(_ notification : Notification){
         if let moreMessages = notification.object as? Bool{
             if !moreMessages{
                 noMoreMessages = false
             }else{
                 noMoreMessages = true
-                collectionView.reloadData()
+            }
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
             }
             removeLoader()
         }
     }
     
-    
+    // message field set up
     lazy var inputTextView : UITextView = {
         let view = UITextView()
         view.isScrollEnabled = false
@@ -248,7 +278,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         view.textContainerInset = UIEdgeInsets(top: 4, left: 4, bottom: 6, right: 4)
         return view
     }()
-    
+    // messagse input delegate methods
     func textViewDidBeginEditing(_ textView: UITextView) {
         DispatchQueue.main.async {
             self.collectionView.scrollToItem(at: IndexPath(item: self.chatMessages.count-1, section: 0), at: .bottom, animated: true)
@@ -377,7 +407,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     @objc func keyboardWillShow(sender: NSNotification) {
         let i = sender.userInfo!
         let k = (i[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue.height
-        bottomConstraintForKeyboard.constant = k - view.safeAreaLayoutGuide.layoutFrame.height + 5
+        bottomConstraintForKeyboard.constant = -k + 10
         let s: TimeInterval = (i[UIResponder.keyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
         UIView.animate(withDuration: s) { self.view.layoutIfNeeded() }
         DispatchQueue.main.async {
@@ -592,7 +622,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
             let ref = Database.database().reference().child("chats").child(id).childByAutoId()
             let timestamp = ServerValue.timestamp()
-            let child = ["content" : text, "sender" : keychain.get("uid")!, "timestamp" : timestamp] as [String : Any]
+            let child = ["content" : text, "sender" : keychain.get("uid")!, "timestamp" : timestamp, "recv" : rUser!.id!, "senderName" : keychain.get("name")!] as [String : Any]
             ref.updateChildValues(child) { (error, ref) in
                 if let error = error{
                     print(error.localizedDescription)

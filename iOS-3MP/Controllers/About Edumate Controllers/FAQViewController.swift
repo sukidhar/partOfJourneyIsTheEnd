@@ -27,7 +27,7 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
     @IBOutlet weak var faqTable: UITableView!
 
     var dataSource = [
-        FAQ(question: "What services does Edumates offer?", answer: nil , isSelected: true, isAnswer: false),
+        FAQ(question: "What services does Edumates offer?", answer: nil , isSelected: false, isAnswer: false),
         FAQ(question: nil , answer: "Edumates helps students connect to university representative via a designated chat-box. The aim of the project is to create a seamless experience for potential students to connect to their respected representative of the university (ambassadors) in order obtain accurate information and make an educated decision to opt for university." , isSelected: nil, isAnswer: true),
         FAQ(question: "What are the Edumates working hours?", answer: nil , isSelected: false, isAnswer: false),
         FAQ(question: nil , answer: "Our team works in accordance with the standard working hours in India/ United Kingdom. However, we understand that our target group is coming from all around the globe where they live in different time zones. Therefore you can leave a message to us via social media and we will stay in touch with you all the time. Your comfort does matter!" , isSelected: nil, isAnswer: true),
@@ -97,6 +97,7 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
             data.isSelected = !(data.isSelected!)
             tableView.reloadRows(at: [IndexPath(row: indexPath.row + 1, section: 0)], with: .middle)
             tableView.endUpdates()
+            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -104,20 +105,19 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
         let data = dataSource[indexPath.row]
         var size : CGRect
         if !data.isAnswer{
-            size = estimateFrameForText(data.question!, for : false)
-            print(size.height)
-            return size.height + 35
+            size = estimateFrameForText(data.question!)
+            return max(50, size.height + 30)
         }
         if indexPath.row%2==1 && dataSource[indexPath.row-1].isSelected! {
-            size = estimateFrameForText(data.answer!, for: true)
-            return size.height
+            size = estimateFrameForText(data.answer!)
+            return max(50, size.height + 35)
         }
         return 0
     }
-    fileprivate func estimateFrameForText(_ text: String,for bool : Bool) -> CGRect {
-        let size = CGSize(width: self.view.frame.width - 55 - (bool ? 75 : 0), height: .greatestFiniteMagnitude)
+    fileprivate func estimateFrameForText(_ text: String) -> CGRect {
+        let size = CGSize(width: self.view.frame.width - 60, height: .greatestFiniteMagnitude)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        return NSString(string: text).boundingRect(with: size, options: options, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.systemFont(ofSize: 16)]), context: nil)
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.systemFont(ofSize: 15)]), context: nil)
     }
     
     fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
@@ -131,87 +131,3 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
     }
 }
 
-
-//    extension FAQViewController : UITableViewDataSource,UITableViewDelegate {
-//        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//            return faqData.count
-//        }
-//
-//        func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//
-//            if self.selectedIndex == indexPath.row && isCollapse == true{
-//                return UITableView.automaticDimension
-//            }
-//            else{
-//                return 60
-//            }
-//        }
-//
-//
-//        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//
-//            if indexPath.row%2 != 0 {
-//                let cellA = faqTable.dequeueReusableCell(withIdentifier:  "ReusableAnswerCell", for: indexPath)
-//                    as! answerCell
-//                cellA.label.text = faqData[indexPath.row]
-//                //set the data here
-//
-//                return cellA
-//
-//            }
-//           else    {
-//                let cellQ = faqTable.dequeueReusableCell(withIdentifier:  "ResuableCell", for: indexPath)
-//                    as! QuestionCell
-//                cellQ.label.text = faqData[indexPath.row]
-//                //set the data here
-//                return cellQ
-//
-//            }
-//
-//
-//        }
-//
-//
-//        func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-//
-//            tableView.deselectRow(at: indexPath, animated: true)
-//        if selectedIndex == indexPath.row+1
-//
-//            {
-//
-//            if self.isCollapse == false
-//
-//                {
-//
-//                self.isCollapse = true
-//
-//                }
-//
-//                else {
-//
-//                self.isCollapse = false
-//
-//                }
-//
-//            }
-//
-//            else {
-//
-//                self.isCollapse = true
-//
-//
-//
-//            }
-//
-//            self.selectedIndex = indexPath.row+1
-//
-//            tableView.reloadRows(at: [indexPath], with: .automatic)
-//
-//        }
-//
-//
-//}
-//
-//
-//
-//

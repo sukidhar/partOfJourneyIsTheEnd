@@ -8,6 +8,7 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.sukidhar.iOS-3MP</string>
 		<string>$(AppIdentifierPrefix)com.testFlightEdumates.eduMates</string>
+		<string>$(AppIdentifierPrefix)com.sukidhar.eduMates</string>
 	</array>
 </dict>
 </plist>

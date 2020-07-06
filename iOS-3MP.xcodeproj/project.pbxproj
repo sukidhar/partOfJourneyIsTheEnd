@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0A09B6A4246C31DF0047F4D3 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A09B6A3246C31DF0047F4D3 /* DataService.swift */; };
-		0A09B6AB246C43A10047F4D3 /* LogOutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A09B6AA246C43A10047F4D3 /* LogOutViewController.swift */; };
 		0A2057B02485FF0100889F44 /* MailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2057AF2485FF0100889F44 /* MailViewController.swift */; };
 		0A2057B624864C8A00889F44 /* UniversityCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2057B124864C8A00889F44 /* UniversityCollectionViewCell.swift */; };
 		0A2057B724864C8A00889F44 /* PlaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2057B224864C8A00889F44 /* PlaceTableViewCell.swift */; };
@@ -41,7 +40,7 @@
 		0A6E1E19246D0931008E2069 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6E1E13246D092B008E2069 /* ProfileViewController.swift */; };
 		0A6E1E1C246D0931008E2069 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6E1E16246D092F008E2069 /* CalendarViewController.swift */; };
 		0A6E1E20246D0949008E2069 /* pageControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6E1E1F246D0949008E2069 /* pageControlViewController.swift */; };
-		0A84BEC4246FCEAE00B88F50 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A84BEC3246FCEAE00B88F50 /* GoogleService-Info.plist */; };
+		0A88C17B24B2270900DC5C2E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A88C17A24B2270800DC5C2E /* GoogleService-Info.plist */; };
 		0A88FFB524ADF868004988A6 /* answerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A88FFB124ADF865004988A6 /* answerCell.swift */; };
 		0A88FFB624ADF868004988A6 /* answerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A88FFB224ADF866004988A6 /* answerCell.xib */; };
 		0A88FFB724ADF868004988A6 /* QuestionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A88FFB324ADF868004988A6 /* QuestionCell.xib */; };
@@ -61,6 +60,7 @@
 		0AF6D1CE249549740076101D /* InternetChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF6D1CD249549730076101D /* InternetChecker.swift */; };
 		0AFDF101248DFB8F002D81C2 /* UniversityChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFDF100248DFB8F002D81C2 /* UniversityChatViewController.swift */; };
 		0AFDF103248DFFE1002D81C2 /* AmbassadorsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFDF102248DFFE1002D81C2 /* AmbassadorsViewController.swift */; };
+		8DD2B3A5026EFA8F59FB2926 /* Pods_iOS_3MP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 170B3D91B5C358B2A003D88F /* Pods_iOS_3MP.framework */; };
 		A120567F2475717400BEC505 /* NewPostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120567E2475717400BEC505 /* NewPostTableViewCell.swift */; };
 		A149A515247ED57C00CE6B2C /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = A149A514247ED57C00CE6B2C /* Message.swift */; };
 		A149A519247FF1B300CE6B2C /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A149A518247FF1B300CE6B2C /* ChatMessageCell.swift */; };
@@ -74,13 +74,24 @@
 		A153D2EE248532DA00DEEED3 /* RecoverPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A153D2E4248532DA00DEEED3 /* RecoverPasswordViewController.swift */; };
 		A1C02646247D9FCE00DCB51C /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C02645247D9FCE00DCB51C /* UserModel.swift */; };
 		A1FE49E12483D2AD00CD7094 /* SideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FE49E02483D2AD00CD7094 /* SideViewController.swift */; };
-		D3C6BC9311B52635BAAD566A /* Pods_iOS_3MP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 623F9C53B20F340DEECAA7B2 /* Pods_iOS_3MP.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0A88C18B24B3680700DC5C2E /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0A09B6A2246C16800047F4D3 /* iOS-3MP.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS-3MP.entitlements"; sourceTree = "<group>"; };
 		0A09B6A3246C31DF0047F4D3 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
-		0A09B6AA246C43A10047F4D3 /* LogOutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogOutViewController.swift; sourceTree = "<group>"; };
 		0A2057AF2485FF0100889F44 /* MailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewController.swift; sourceTree = "<group>"; };
 		0A2057B124864C8A00889F44 /* UniversityCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniversityCollectionViewCell.swift; sourceTree = "<group>"; };
 		0A2057B224864C8A00889F44 /* PlaceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceTableViewCell.swift; sourceTree = "<group>"; };
@@ -115,7 +126,7 @@
 		0A6E1E13246D092B008E2069 /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		0A6E1E16246D092F008E2069 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		0A6E1E1F246D0949008E2069 /* pageControlViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = pageControlViewController.swift; sourceTree = "<group>"; };
-		0A84BEC3246FCEAE00B88F50 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0A88C17A24B2270800DC5C2E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A88FFB124ADF865004988A6 /* answerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = answerCell.swift; sourceTree = "<group>"; };
 		0A88FFB224ADF866004988A6 /* answerCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = answerCell.xib; sourceTree = "<group>"; };
 		0A88FFB324ADF868004988A6 /* QuestionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = QuestionCell.xib; sourceTree = "<group>"; };
@@ -135,9 +146,8 @@
 		0AF6D1CD249549730076101D /* InternetChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetChecker.swift; sourceTree = "<group>"; };
 		0AFDF100248DFB8F002D81C2 /* UniversityChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversityChatViewController.swift; sourceTree = "<group>"; };
 		0AFDF102248DFFE1002D81C2 /* AmbassadorsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbassadorsViewController.swift; sourceTree = "<group>"; };
-		2B86A69D099C96436A551D12 /* Pods-iOS-3MP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-3MP.release.xcconfig"; path = "Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP.release.xcconfig"; sourceTree = "<group>"; };
-		586DD4553EFA417C057CC734 /* Pods-iOS-3MP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-3MP.debug.xcconfig"; path = "Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP.debug.xcconfig"; sourceTree = "<group>"; };
-		623F9C53B20F340DEECAA7B2 /* Pods_iOS_3MP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOS_3MP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F865B050C9A90E43593C904 /* Pods-iOS-3MP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-3MP.release.xcconfig"; path = "Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP.release.xcconfig"; sourceTree = "<group>"; };
+		170B3D91B5C358B2A003D88F /* Pods_iOS_3MP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOS_3MP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A120567E2475717400BEC505 /* NewPostTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostTableViewCell.swift; sourceTree = "<group>"; };
 		A149A514247ED57C00CE6B2C /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		A149A518247FF1B300CE6B2C /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
@@ -151,6 +161,7 @@
 		A153D2E4248532DA00DEEED3 /* RecoverPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverPasswordViewController.swift; sourceTree = "<group>"; };
 		A1C02645247D9FCE00DCB51C /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		A1FE49E02483D2AD00CD7094 /* SideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideViewController.swift; sourceTree = "<group>"; };
+		F66198BA5D6AA74704F063BE /* Pods-iOS-3MP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-3MP.debug.xcconfig"; path = "Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,7 +169,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3C6BC9311B52635BAAD566A /* Pods_iOS_3MP.framework in Frameworks */,
+				8DD2B3A5026EFA8F59FB2926 /* Pods_iOS_3MP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,7 +187,6 @@
 				0ABF6E53248E6A42002AB049 /* FullPostViewController.swift */,
 				0ABF6E55248E6A5C002AB049 /* HomeViewController.swift */,
 				A153D2E3248532DA00DEEED3 /* LoginZoneViewController.swift */,
-				0A09B6AA246C43A10047F4D3 /* LogOutViewController.swift */,
 				0A2057AF2485FF0100889F44 /* MailViewController.swift */,
 				0A2057C32486505100889F44 /* mapViewController.swift */,
 				A153D2DA248514A400DEEED3 /* NewsfeedSideViewController.swift */,
@@ -247,7 +257,7 @@
 				0A4F3FE2246961B10098B036 /* iOS-3MP */,
 				0A4F3FE1246961B10098B036 /* Products */,
 				5B6AB0FD7EDAF8F7A6E247F1 /* Pods */,
-				8D1E916D0F958F64953F8022 /* Frameworks */,
+				A0B826F9DBF8F36D9166C210 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -270,8 +280,8 @@
 				0A09B6A9246C43840047F4D3 /* View */,
 				0A4F3FF1246961B40098B036 /* LaunchScreen.storyboard */,
 				0AC0548A248C12650091BDBD /* Assets.xcassets */,
-				0A84BEC3246FCEAE00B88F50 /* GoogleService-Info.plist */,
 				0A4F3FF4246961B40098B036 /* Info.plist */,
+				0A88C17A24B2270800DC5C2E /* GoogleService-Info.plist */,
 				0A4F3FEC246961B10098B036 /* iOS_3MP.xcdatamodeld */,
 			);
 			path = "iOS-3MP";
@@ -310,16 +320,16 @@
 		5B6AB0FD7EDAF8F7A6E247F1 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				586DD4553EFA417C057CC734 /* Pods-iOS-3MP.debug.xcconfig */,
-				2B86A69D099C96436A551D12 /* Pods-iOS-3MP.release.xcconfig */,
+				F66198BA5D6AA74704F063BE /* Pods-iOS-3MP.debug.xcconfig */,
+				0F865B050C9A90E43593C904 /* Pods-iOS-3MP.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		8D1E916D0F958F64953F8022 /* Frameworks */ = {
+		A0B826F9DBF8F36D9166C210 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				623F9C53B20F340DEECAA7B2 /* Pods_iOS_3MP.framework */,
+				170B3D91B5C358B2A003D88F /* Pods_iOS_3MP.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -331,12 +341,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0A4F3FF7246961B40098B036 /* Build configuration list for PBXNativeTarget "iOS-3MP" */;
 			buildPhases = (
-				29AECBE647B749520EA597A9 /* [CP] Check Pods Manifest.lock */,
+				AC6D762104E2FC322FCEA8E7 /* [CP] Check Pods Manifest.lock */,
 				0A4F3FDC246961B10098B036 /* Sources */,
 				0A4F3FDD246961B10098B036 /* Frameworks */,
 				0A4F3FDE246961B10098B036 /* Resources */,
-				0C39C25FA4D786CFA7EB6BE7 /* [CP] Embed Pods Frameworks */,
-				0259723634831ACD6970BDB8 /* [CP] Copy Pods Resources */,
+				B4C0D7C34E4A5660787E083A /* [CP] Embed Pods Frameworks */,
+				38E2F7270D67E55B5BE99E31 /* [CP] Copy Pods Resources */,
+				0A88C18B24B3680700DC5C2E /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -389,11 +400,11 @@
 				0A630663248B76BB00234101 /* DepartmentCollectionViewCell.xib in Resources */,
 				0A2057B824864C8A00889F44 /* UniversityCollectionViewCell.xib in Resources */,
 				0A4F3FF3246961B40098B036 /* LaunchScreen.storyboard in Resources */,
-				0A84BEC4246FCEAE00B88F50 /* GoogleService-Info.plist in Resources */,
 				0A4F3FEB246961B10098B036 /* Main.storyboard in Resources */,
 				0AC0548B248C12660091BDBD /* Assets.xcassets in Resources */,
 				0A2057BA24864C8A00889F44 /* PlaceTableViewCell.xib in Resources */,
 				0A88FFB624ADF868004988A6 /* answerCell.xib in Resources */,
+				0A88C17B24B2270900DC5C2E /* GoogleService-Info.plist in Resources */,
 				0ABF6E50248E11A4002AB049 /* UserIconCollectionViewCell.xib in Resources */,
 				0A2057CB248655CC00889F44 /* PopUpUniversityViewController.xib in Resources */,
 			);
@@ -402,7 +413,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0259723634831ACD6970BDB8 /* [CP] Copy Pods Resources */ = {
+		38E2F7270D67E55B5BE99E31 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -419,24 +430,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0C39C25FA4D786CFA7EB6BE7 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		29AECBE647B749520EA597A9 /* [CP] Check Pods Manifest.lock */ = {
+		AC6D762104E2FC322FCEA8E7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -456,6 +450,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B4C0D7C34E4A5660787E083A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOS-3MP/Pods-iOS-3MP-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -481,7 +492,6 @@
 				0A4F3FE4246961B10098B036 /* AppDelegate.swift in Sources */,
 				0A2057CC248655CC00889F44 /* PopUpUniversityViewController.swift in Sources */,
 				0A2057B624864C8A00889F44 /* UniversityCollectionViewCell.swift in Sources */,
-				0A09B6AB246C43A10047F4D3 /* LogOutViewController.swift in Sources */,
 				0A6306512487E49F00234101 /* UserCell.swift in Sources */,
 				0AF6D1C8249362E40076101D /* DBConnector.swift in Sources */,
 				0A4F3FEE246961B10098B036 /* iOS_3MP.xcdatamodeld in Sources */,
@@ -662,30 +672,9 @@
 		};
 		0A4F3FF8246961B40098B036 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 586DD4553EFA417C057CC734 /* Pods-iOS-3MP.debug.xcconfig */;
+			baseConfigurationReference = F66198BA5D6AA74704F063BE /* Pods-iOS-3MP.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "iOS-3MP/iOS-3MP.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7SFL7KYWRD;
-				INFOPLIST_FILE = "iOS-3MP/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.sukidhar.iOS-3MP";
-				PRODUCT_NAME = eduMates;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		0A4F3FF9246961B40098B036 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B86A69D099C96436A551D12 /* Pods-iOS-3MP.release.xcconfig */;
-			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "iOS-3MP/iOS-3MP.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -697,7 +686,30 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.sukidhar.iOS-3MP";
+				PRODUCT_BUNDLE_IDENTIFIER = com.sukidhar.eduMates;
+				PRODUCT_NAME = eduMates;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0A4F3FF9246961B40098B036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0F865B050C9A90E43593C904 /* Pods-iOS-3MP.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "iOS-3MP/iOS-3MP.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L98V275EU9;
+				INFOPLIST_FILE = "iOS-3MP/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sukidhar.eduMates;
 				PRODUCT_NAME = eduMates;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

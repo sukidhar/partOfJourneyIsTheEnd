@@ -204,7 +204,6 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
                 }
                 if let docs = snap?.documents{
                     for doc in docs{
-                        
                         let data = doc.data()
                         if let title = data["name"] as? String, let coordinates = data["location"] as? GeoPoint{
                             defer {
@@ -308,13 +307,27 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.row
+//        Firestore.firestore().collection("university").document(favorites[indexPath.item].ID).getDocument { (snap, error) in
+//            if let error = error{
+//                print(error)
+//                return
+//            }else{
+//                snap?.reference.updateData(["department" : self.favorites[self.selectedIndex!].Departments])
+//                snap?.reference.updateData(["department " : "nomoredata"])
+//            }
+//        }
         performSegue(withIdentifier: "universityPage", sender: self)
     }
     
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let vc = segue.destination as! UniversityViewController
-        vc.university = favorites[selectedIndex!]
+        if searchTextCountIsZero {
+            vc.university = favorites[selectedIndex!]
+        }else{
+            vc.university = filteredData[selectedIndex!]
+        }
+        
     }
     
 }
