@@ -14,8 +14,11 @@ class SplashViewController: UIViewController {
 
     var homeViewController : UITabBarController!
     let keychain = DataService().keyChain
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkers.isGoingToBackground()
         UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
         homeViewController = self.storyboard?.instantiateViewController(withIdentifier: "TabBarVC") as? UITabBarController
         
@@ -30,7 +33,24 @@ class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         if let isAmb = DataService().keyChain.getBool("isAmbassador"){
             
-               if isAmb{
+            if let savedUni = UserDefaults.standard.object(forKey: "ambassadorUniversity") as? Data{
+
+                let decoder = JSONDecoder()
+                if let university = try? decoder.decode(UniversityModel.self, from: savedUni){
+                    if isAmb{
+                        let vc1 = self.storyboard?.instantiateViewController(withIdentifier: "HomeView") as! UINavigationController
+                        let uniVC = self.storyboard?.instantiateViewController(withIdentifier: "UniversityPage") as! UniversityViewController
+                        uniVC.university = university
+                        let vc2 = UINavigationController(rootViewController: uniVC)
+                        self.homeViewController.viewControllers = [vc1,vc2] as [UIViewController]
+                        self.homeViewController.tabBar.items?[1].image = #imageLiteral(resourceName: "Icon awesome-university").resize(25 , 25)
+                        self.homeViewController.tabBar.items?[1].title = "My University"
+                        NotificationCenter.default.post(name: NSNotification.Name("canLoadToHomeScreen"), object: nil)
+                        return
+                    }
+                }
+            }
+            if isAmb{
                 let vc1 = self.storyboard?.instantiateViewController(withIdentifier: "HomeView") as! UINavigationController
                 let uniVC = self.storyboard?.instantiateViewController(withIdentifier: "UniversityPage") as! UniversityViewController
                    let data = Strongbox().unarchive(objectForKey: "data") as! [String:Any]
@@ -48,8 +68,7 @@ class SplashViewController: UIViewController {
                                    if departments == nil{
                                        departments = data["department "] as? [[String:String]]
                                    }
-                                   let loc = CLLocationCoordinate2D(latitude: latt, longitude: long)
-                                   let newUni = UniversityModel(ID: snap!.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title, coordinates: loc, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
+                                   let newUni = UniversityModel(ID: snap!.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title,longitude: long,lattitude: latt , address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
                                    uniVC.university = newUni
                                    let vc2 = UINavigationController(rootViewController: uniVC)
                                    self.homeViewController.viewControllers = [vc1,vc2] as [UIViewController]
@@ -77,5 +96,4 @@ class SplashViewController: UIViewController {
             }
         }
     }
-
 }

@@ -20,7 +20,7 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UICollectionV
     var universities = [UniversityModel]()
     var basicUniversities = [UniversityModel](){
         didSet{
-            print("hello")
+
             UniversityCollectionView.reloadData()
         }
     }
@@ -37,9 +37,11 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UICollectionV
 //    @IBOutlet weak var searchbar: UISearchBar!
     
     let db = Firestore.firestore()
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Checkers().isGoingToBackground()
+        checkers.isGoingToBackground()
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         navSearchBar.barTintColor = .white
         if #available(iOS 13.0, *) {
@@ -72,22 +74,21 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UICollectionV
     override func viewDidAppear(_ animated: Bool) {
         initialUniversites = globalValues.universties
         canLogin()
+        
+        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.9960784314, green: 0.5882352941, blue: 0, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        self.navigationItem.title = ""
     }
     @IBAction func searchPressed(_ sender: UIBarButtonItem) {
         if navSearchBar.isHidden {
             navSearchBar.becomeFirstResponder()
             navSearchBar.isHidden = false
-            if #available(iOS 13.0, *) {
-                sender.image = UIImage(systemName: "xmark")
-            } else {
-                // Fallback on earlier versions
-                sender.image = #imageLiteral(resourceName: "xmark")
-            }
+            self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(self.searchPressed(_:))), animated: true)
         }
         else{
             navSearchBar.isHidden = true
-            sender.image = #imageLiteral(resourceName: "Group 1950")
             navSearchBar.endEditing(true)
+            self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchPressed(_:))), animated: true)
             if #available(iOS 13.0, *) {
                 navSearchBar.searchTextField.text = ""
             } else {
@@ -106,13 +107,7 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UICollectionV
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -154,8 +149,7 @@ class SearchViewController: UIViewController, UISearchBarDelegate, UICollectionV
                     if departments == nil{
                         departments = data["department "] as? [[String:String]]
                     }
-                    let loc = CLLocationCoordinate2D(latitude: latt, longitude: long)
-                    let newUni = UniversityModel(ID: snap.documentID, description: data["description"] as? String ?? data["description "] as? String, imageURL: data["image"] as? String ?? "" , title: title, coordinates: loc, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "",logo : data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
+                    let newUni = UniversityModel(ID: snap.documentID, description: data["description"] as? String ?? data["description "] as? String, imageURL: data["image"] as? String ?? "" , title: title, longitude: long,lattitude: latt, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "",logo : data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
                     self.universities.append(newUni)
                     }
                 }

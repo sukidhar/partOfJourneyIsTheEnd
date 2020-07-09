@@ -10,6 +10,7 @@ import UIKit
 
 class UserIconCollectionViewCell: UICollectionViewCell {
 
+    @IBOutlet weak var courseLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var imageVIew: UIImageView!
     override func awakeFromNib() {

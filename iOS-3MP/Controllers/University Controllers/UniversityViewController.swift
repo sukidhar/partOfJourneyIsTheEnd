@@ -38,8 +38,11 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
     let url = "https://youtu.be/embed/OVQflPxD8ik"
     var runningAnimations = [UIViewPropertyAnimator]()
     var animationProgressWhenInterrupted:CGFloat = 0
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkers.isGoingToBackground()
         
         UniversityViewController.i = 0
         setupCard()
@@ -62,20 +65,17 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     override func viewWillAppear(_ animated: Bool) {
-        print("hello")
+        self.navigationController?.navigationBar.isHidden = true
         if self.tabBarController?.tabBar.items?[1].title == "My University"{
             self.hidesBottomBarWhenPushed = false
             backButton.isHidden = true
-            self.navigationController?.navigationBar.isHidden = true
             self.tabBarController?.tabBar.isHidden = false
+            if let isAmb = DataService().keyChain.getBool("isAmbassador"){
+                self.tabBarController?.tabBar.isHidden = !isAmb
+            }
         }
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -127,6 +127,17 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
         
         popUpUniversityViewController.universityTItle.text = university?.title
         popUpUniversityViewController.descriptionLabel.text =  university?.description ?? ""
+        let frame = NSString(string: popUpUniversityViewController.descriptionLabel.text).boundingRect(
+            with: CGSize(width: self.view.frame.width - 60, height: .infinity),
+            options: [.usesFontLeading, .usesLineFragmentOrigin],
+            attributes: [.font : UIFont(name: "helvetica neue", size: 15)!],
+            context: nil)
+        let height = frame.size.height + 20
+        print(height)
+        popUpUniversityViewController.descriptionLabel.isScrollEnabled = false
+        popUpUniversityViewController.heightOfDescription.constant = height
+        popUpUniversityViewController.heightOfEntireCard.constant = 1128 + height
+        popUpUniversityViewController.heightOfDescriptionHolder.constant = 148 + height
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UniversityViewController.handleCardTap(recognzier:)))
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(UniversityViewController.handleCardPan(recognizer:)))
         
@@ -163,7 +174,7 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
     func handleCardTap(recognzier:UITapGestureRecognizer) {
         switch recognzier.state {
         case .ended:
-            animateTransitionIfNeeded(state: nextState, duration: 0.9)
+            animateTransitionIfNeeded(state: nextState, duration: 0.5)
         default:
             break
         }
@@ -173,14 +184,17 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
     func handleCardPan (recognizer:UIPanGestureRecognizer) {
         switch recognizer.state {
         case .began:
-            startInteractiveTransition(state: nextState, duration: 0.9)
+            startInteractiveTransition(state: nextState, duration: 0.8)
+            popUpUniversityViewController.scrollView.isScrollEnabled = false
         case .changed:
             let translation = recognizer.translation(in: self.popUpUniversityViewController.handleArea)
             var fractionComplete = translation.y / cardHeight
+            print(fractionComplete)
             fractionComplete = cardVisible ? fractionComplete : -fractionComplete
             updateInteractiveTransition(fractionCompleted: fractionComplete)
         case .ended:
             continueInteractiveTransition()
+            popUpUniversityViewController.scrollView.isScrollEnabled = true
         default:
             break
         }
@@ -219,6 +233,7 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
                     case .collapsed:
                         self.flip(first: self.popUpUniversityViewController.handleImage, second:  self.popUpUniversityViewController.handleImage2, bool: false)
                         self.popUpUniversityViewController.view.frame.origin.y = self.view.frame.height - self.cardHandleAreaHeight
+                        self.popUpUniversityViewController.scrollView.setContentOffset(.zero, animated: true)
                     }
                 }
                 
@@ -259,15 +274,29 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
         }
     
     @IBAction func backPressed(_ sender: UIButton) {
-        self.dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
     @objc func chatPressed(_ sender : UIButton){
-        performSegue(withIdentifier: "chatView", sender: self)    }
+        if let storyboard = self.storyboard{
+            if let vc = storyboard.instantiateViewController(withIdentifier: "UniversityChatViewController") as? UniversityChatViewController{
+                vc.university = university
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+    }
     
     @objc func explorePressed(_ sender : UIButton)
     {
-        performSegue(withIdentifier: "mapView", sender: self)
+        if let storyboard = self.storyboard{
+            if let mapVC = storyboard.instantiateViewController(withIdentifier: "mapViewController") as? mapViewController{
+                mapVC.navigationItem.title =  university?.title ?? "Explore"
+                mapVC.coordinates = CLLocationCoordinate2D(latitude: university!.lattitude, longitude: university!.longitude)
+                mapVC.UniversityName = university?.title ?? ""
+                mapVC.UniversityAddress = university?.address ?? ""
+                self.navigationController?.pushViewController(mapVC, animated: true)
+            }
+        }
     }
     
     
@@ -276,7 +305,7 @@ class UniversityViewController: UIViewController, UICollectionViewDelegate, UICo
             
             if let mapVC = nav.topViewController as? mapViewController{
                 mapVC.navigationItem.title =  university?.title ?? "Explore"
-                mapVC.coordinates = university?.coordinates ?? CLLocationCoordinate2D()
+                mapVC.coordinates = CLLocationCoordinate2D(latitude: university!.lattitude, longitude: university!.longitude)
                 mapVC.UniversityName = university?.title ?? ""
                 mapVC.UniversityAddress = university?.address ?? ""
             }

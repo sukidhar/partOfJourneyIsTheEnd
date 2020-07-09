@@ -11,10 +11,12 @@ import UIKit
 
 
 class PostModel {
+    var id: String?
     var content: String?
     var title : String?
     var userId : String?
     var userName : String?
     var universityID: String?
     var likes: Int?
+    var image: String?
 }

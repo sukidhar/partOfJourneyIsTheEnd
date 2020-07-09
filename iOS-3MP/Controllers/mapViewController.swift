@@ -33,9 +33,11 @@ class mapViewController: UIViewController,UITableViewDelegate,UITableViewDataSou
     
     var coordinates : CLLocationCoordinate2D?
     var camera = GMSCameraPosition()
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Checkers().isGoingToBackground()
+        checkers.isGoingToBackground()
         // Do any additional setup after loading the view.
         heightOfMap.constant = UIScreen.main.bounds.height/2
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
@@ -78,13 +80,7 @@ class mapViewController: UIViewController,UITableViewDelegate,UITableViewDataSou
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     override func viewDidAppear(_ animated: Bool) {
         canLogin()
@@ -95,7 +91,17 @@ class mapViewController: UIViewController,UITableViewDelegate,UITableViewDataSou
             goToLoginScreen()
         }
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationItem.title = UniversityName
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        self.navigationController?.navigationBar.isHidden = false
+        self.navigationController?.navigationBar.tintColor = .white
+        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.01960784314, green: 0.137254902, blue: 0.2392156863, alpha: 1)
+        self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.hidesBottomBarWhenPushed = true
+        self.tabBarController?.tabBar.isHidden = true
+        
+    }
     
     func goToLoginScreen(){
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC")

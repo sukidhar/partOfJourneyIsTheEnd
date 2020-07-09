@@ -15,12 +15,13 @@ import IQKeyboardManagerSwift
 import UserNotifications
 import FirebaseMessaging
 
-let googleKey = "AIzaSyAwSwedV6lCk97Ib0BN-k80k2c9gc7G5rA"
+let googleKey = "AIzaSyAkU6z7jNV_DyUCPJhVYKjEzHfNJsYjEPI"
 let gcmMessageIDKey = "gcm.message_id"
+var status = "offline"
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-   
+   var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -30,7 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setNotificationConfiguration()
         Messaging.messaging().delegate = self
         application.registerForRemoteNotifications()
-        
+
+        application.applicationIconBadgeNumber = 0
         InstanceID.instanceID().instanceID { (result, error) in
             if let error = error {
                 print("Error fetching remote instance ID: \(error)")
@@ -41,20 +43,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared.enable = true
         IQKeyboardManager.shared.disabledDistanceHandlingClasses.append(ChatLogController.self)
         IQKeyboardManager.shared.disabledToolbarClasses = [ChatLogController.self]
+        Database.database().isPersistenceEnabled = true
+        if let uid = DataService().keyChain.get("uid"){
+            if status == "offline"{
+                OnlineOfflineService.online(for: uid, status: "online") { (bool) in
+                    status = "online"
+                }
+            }
+        }
+        if let launchOptions = launchOptions,
+            let userInfo = launchOptions[.remoteNotification] as? [AnyHashable: Any]
+        {
+            if let threadId = userInfo["threadId"] as? String,let title = userInfo["title"] as? String{
+              showChatViewController(threadId: threadId, title: title)
+            }
+        }
         
         GMSServices.provideAPIKey(googleKey)
         GMSPlacesClient.provideAPIKey(googleKey)
-        Database.database().isPersistenceEnabled = true
-        if let uid = DataService().keyChain.get("uid"){
-            OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-                print(bool)
-            }
-        }
+        
         return true
     }
+    
     func applicationWillTerminate(_ application: UIApplication) {
         if let uid = DataService().keyChain.get("uid"){
             OnlineOfflineService.online(for: uid, status: "offline") { (bool) in
+                print(bool)
+            }
+        }
+    }
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        if let uid = DataService().keyChain.get("uid"){
+            OnlineOfflineService.online(for: uid, status: "online") { (bool) in
                 print(bool)
             }
         }
@@ -70,14 +90,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // If you are receiving a notification message while your app is in the background,
       // this callback will not be fired till the user taps on the notification launching the application.
       // TODO: Handle data of notification
-
       // With swizzling disabled you must let Messaging know about the message, for Analytics
        Messaging.messaging().appDidReceiveMessage(userInfo)
-
-      // Print message ID.
-      if let messageID = userInfo[gcmMessageIDKey] {
-        print("Message ID: \(messageID)")
-      }
 
       // Print full message.
       print(userInfo)
@@ -125,11 +139,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let authOptions : UNAuthorizationOptions = [.alert,.badge,.sound]
         
-        let viewAction = UNNotificationAction(identifier: "view", title: "View", options: .authenticationRequired)
+        let viewAction = UNNotificationAction(identifier: "view", title: "View", options: [.authenticationRequired])
         
-        let replyAction = UNNotificationAction(identifier: "reply", title: "Reply", options: .authenticationRequired)
+        let replyAction = UNTextInputNotificationAction(identifier: "reply", title: "Reply", options: [.authenticationRequired])
         
-        let category = UNNotificationCategory(identifier: "notificationActions", actions: [viewAction,replyAction], intentIdentifiers: [], options: [])
+        let category = UNNotificationCategory(identifier: "eduMatesNotification", actions: [viewAction,replyAction], intentIdentifiers: [],hiddenPreviewsBodyPlaceholder: "", options: [])
         
         UNUserNotificationCenter.current().setNotificationCategories([category])
         
@@ -140,26 +154,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Core Data stack
 
     lazy var persistentContainer: NSPersistentContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-        */
         let container = NSPersistentContainer(name: "iOS_3MP")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                 
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
+                
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
@@ -191,36 +189,135 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                               willPresent notification: UNNotification,
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     let userInfo = notification.request.content.userInfo
-    
-    // With swizzling disabled you must let Messaging know about the message, for Analytics
     Messaging.messaging().appDidReceiveMessage(userInfo)
-
-    // Print message ID.
-    if let messageID = userInfo[gcmMessageIDKey] {
-      print("Message ID: \(messageID)")
+    print("notification")
+    if isChatController(){
+        completionHandler([])
+    }else if isChatLogController(senderId: userInfo["threadId"] as? String){
+        completionHandler([])
     }
-
-    // Print full message.
-    print(userInfo)
-
-    // Change this to your preferred presentation option
-    completionHandler([[.alert,.badge,.sound]])
+    else{
+        completionHandler([[.alert,.badge,.sound]])
+    }
   }
+    
+    private func isChatController()->Bool{
+        guard let tabBarVC = UIApplication.shared.windows.filter( {$0.rootViewController is UITabBarController } ).first?.rootViewController as? UITabBarController else { return false }
+        let firstNavbar = tabBarVC.selectedViewController as? UINavigationController
+        let topVC = firstNavbar?.topViewController
+        if topVC is ChatController{
+            return true
+        }
+        return false
+    }
+    
+    private func isChatLogController(senderId : String?)->Bool{
+        guard let id = senderId else {return false}
+        guard let tabBarVC = UIApplication.shared.windows.filter( {$0.rootViewController is UITabBarController } ).first?.rootViewController as? UITabBarController else { return false}
+        let firstNavbar = tabBarVC.selectedViewController as? UINavigationController
+        if let topVC = firstNavbar?.topViewController as? ChatLogController{
+            if topVC.rUser?.id == id {
+                return true
+            }
+        }
+        return false
+    }
 
   func userNotificationCenter(_ center: UNUserNotificationCenter,
                               didReceive response: UNNotificationResponse,
                               withCompletionHandler completionHandler: @escaping () -> Void) {
     let userInfo = response.notification.request.content.userInfo
-    // Print message ID.
-    if let messageID = userInfo[gcmMessageIDKey] {
-      print("Message ID: \(messageID)")
+
+    if let senderId = userInfo["threadId"] as? String{
+        print(response.actionIdentifier)
+        if response.actionIdentifier == "com.apple.UNNotificationDefaultActionIdentifier" || response.actionIdentifier == "view"{
+            let title = response.notification.request.content.title
+            showChatViewController(threadId: senderId,title : title)
+        }else if response.actionIdentifier == "reply"{
+            if let textResponse = response as? UNTextInputNotificationResponse{
+                var text = textResponse.userText
+                text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                DBAccessor.shared.getChatPartner(for: senderId) { (sender) in
+                    if let partner = sender{
+                        let ref = Database.database().reference().child("chats").child(partner.chatID).childByAutoId()
+                        let timestamp = ServerValue.timestamp()
+                        let child = ["content" : text, "sender" : DataService().keyChain.get("uid")!, "timestamp" : timestamp, "recv" : senderId, "senderName" : DataService().keyChain.get("name")!] as [String : Any]
+                        ref.setValue(child)
+                        self.updateUserChats(text: text, timestamp: timestamp, partner: partner)
+                        self.updatePartnerChats(text: text, timestamp: timestamp, partner: partner)
+                    }
+                }
+            }
+        }
     }
-
-    // Print full message.
-    print(userInfo)
-
     completionHandler()
   }
+    
+    func updateUserChats(text  : String, timestamp : [AnyHashable : Any] , partner : Partner){
+        if let uid = DataService().keyChain.get("uid"){
+            let values = ["chat" : partner.chatID, "lastActive" : timestamp, "latest" : text, "name" : partner.name as Any ] as [String : Any]
+            Database.database().reference().child("userChats").child(uid).child(partner.id).updateChildValues(values) { (error, ref) in
+                if let error = error{
+                    print(error.localizedDescription)
+                    return
+                }
+            }
+        }
+    }
+    
+    func updatePartnerChats(text : String, timestamp : [AnyHashable : Any], partner : Partner){
+        if let uid = DataService().keyChain.get("uid"){
+            let values = ["chat" : partner.chatID, "lastActive" : timestamp, "latest" : text, "name" : DataService().keyChain.get("name")!] as [String : Any]
+            Database.database().reference().child("userChats").child(partner.id).child(uid).updateChildValues(values) { (error, ref) in
+                if let error = error{
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+
+    
+    func showChatViewController(threadId : String,title : String){
+        guard let tabBarVC = UIApplication.shared.windows.filter( {$0.rootViewController is UITabBarController } ).first?.rootViewController as? UITabBarController else { return }
+        tabBarVC.selectedIndex = 0
+        guard let chatVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChatController") as? ChatController else {
+            return }
+        
+        if let navController = tabBarVC.viewControllers?[0] as? UINavigationController {
+           navController.popToRootViewController(animated: false)
+           navController.pushViewController(chatVC, animated: false)
+            let chatController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+            DBAccessor.shared.getChatID(for: threadId) { (string) in
+                let chatId = string
+                chatVC.getUser(partner: threadId) { (partnerUser) in
+                    if let user = partnerUser{
+                        user.id = threadId
+                        user.name = title
+                        chatVC.hidesBottomBarWhenPushed = true
+                        chatController.rUser = user
+                        chatController.chatID = chatId
+                        if navController.topViewController is ChatLogController{
+                            navController.popToViewController(chatVC, animated: false)
+                        }
+                        navController.pushViewController(chatController, animated: false)
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    func getUniversity()->UniversityModel?{
+        if let savedUni = UserDefaults.standard.object(forKey: "ambassadorUniversity") as? Data{
+            let decoder = JSONDecoder()
+            if let university = try? decoder.decode(UniversityModel.self, from: savedUni){
+                return university
+            }
+        }
+        return nil
+    }
+    
 }
 
 extension AppDelegate: MessagingDelegate{
@@ -229,6 +326,7 @@ extension AppDelegate: MessagingDelegate{
         let dataDict:[String: String] = ["token": fcmToken]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         let keychain = DataService().keyChain
+        print(fcmToken)
         UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
         // sending the changed token to database fcmToken
         if let uid = keychain.get("uid"){

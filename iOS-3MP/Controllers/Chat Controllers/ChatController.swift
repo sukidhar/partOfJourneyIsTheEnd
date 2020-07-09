@@ -20,24 +20,41 @@ struct Partner {
     var latest : String
     let name : String
 }
-class ChatController: UITableViewController {
+class ChatController: UITableViewController, UISearchResultsUpdating, UISearchBarDelegate{
     
+    
+    
+    
+    lazy var searchController : UISearchController = {
+        let s = UISearchController(searchResultsController: nil)
+        s.searchResultsUpdater = self
+        s.obscuresBackgroundDuringPresentation = false
+        s.dimsBackgroundDuringPresentation = false
+        s.searchBar.placeholder = "Search People"
+        s.searchBar.searchBarStyle = .prominent
+        s.searchBar.scopeButtonTitles = []
+        s.searchBar.delegate = self
+        return s
+    }()
     //MARK: -  Variables
+    var filteredPartners = [Partner]()
     let keychain = DataService().keyChain
     var db = Firestore.firestore()
-    let checkers = Checkers()
     override func viewWillDisappear(_ animated: Bool) {
         self.hidesBottomBarWhenPushed = false
     }
     
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        //observers for going to background and active
         checkers.isGoingToBackground()
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        //observers for going to background and active
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
-        
+
         //Rightside nav bar icon
-        
+        self.navigationItem.searchController = searchController
         let image = UIImage(named: "new_message_icon")
         self.hidesBottomBarWhenPushed = true
         self.tabBarController?.tabBar.isHidden = true
@@ -54,13 +71,7 @@ class ChatController: UITableViewController {
     //MARK: - oberseves active status
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     //MARK: - can login
     func canLogin(){
@@ -77,7 +88,11 @@ class ChatController: UITableViewController {
         self.view.window?.makeKeyAndVisible()
     }
     override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.hidesBottomBarWhenPushed = true
+        self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.999904573, green: 1, blue: 0.9998808503, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationItem.title = "Chats"
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -147,12 +162,21 @@ class ChatController: UITableViewController {
     }
     //MARK: - Table View data source methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        partners.sort { (partner1, partner2) -> Bool in
-            //sort the data retrived based on time stamps just before they are loaded
-            let timeDifference = partner1.lastActive - partner2.lastActive
-            return timeDifference > 0
+        if !shouldShowSearchContent(){
+            partners.sort { (partner1, partner2) -> Bool in
+                //sort the data retrived based on time stamps just before they are loaded
+                let timeDifference = partner1.lastActive - partner2.lastActive
+                return timeDifference > 0
+            }
+            return partners.count
+        }else{
+            filteredPartners.sort { (partner1, partner2) -> Bool in
+                //sort the data retrived based on time stamps just before they are loaded
+                let timeDifference = partner1.lastActive - partner2.lastActive
+                return timeDifference > 0
+            }
+            return filteredPartners.count
         }
-        return partners.count
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -161,29 +185,67 @@ class ChatController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let partner = partners[indexPath.row]
+        var partner : Partner
+        if shouldShowSearchContent(){
+            partner = filteredPartners[indexPath.row]
+        }else{
+            partner = partners[indexPath.row]
+        }
         //chat user has been selected so the chat log controller will be shown from here after the fetching of minimal data is done
-        Firestore.firestore().collection("USER").document(partner.id).getDocument { (snap, error) in
-            if let error = error {
-                print(error.localizedDescription)
+        
+        getUser(partner: partner.id) { (user) in
+            if let user = user{
+                user.id = partner.id
+                user.name = partner.name
+               self.showChatController(rUser: user, for : partner.chatID)
                 return
             }
-            if let data = snap?.data(){
-                let newUser =  UserModel()
-                newUser.id = partner.id
-                  newUser.name = data["name"] as? String
-                  newUser.email = data["email"] as? String
-                  newUser.uni = data["university"] as? String
-                  newUser.imageUrl = data["imageUrl"] as? String
-                self.showChatController(rUser: newUser, for : partner.chatID)
+        }
+    }
+    
+    func getUser(partner : String,handler : @escaping (_ user : UserModel?)->Void) {
+        let ref = Database.database().reference().child("USER").child(partner)
+        ref.observeSingleEvent(of: .value) { (snap) in
+            if let data = snap.value as? [String:Any]{
+                print(data)
+                let user = UserModel()
+                user.imageUrl = data["imageUrl"] as? String
+                user.uni = data["university"] as? String
+                user.course = data["course"] as? String
+                handler(user)
+            }else{
+                 handler(nil)
             }
         }
+        ref.removeAllObservers()
+        
     }
     // cell for each partner
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! UserCell
-        cell.partner = partners[indexPath.row]
+        if shouldShowSearchContent(){
+            cell.partner = filteredPartners[indexPath.row]
+        }else{
+            cell.partner = partners[indexPath.row]
+        }
         return cell
     }
-    
+    func shouldShowSearchContent()->Bool{
+        return !isSearchEmpty() && searchController.isActive
+    }
+    func isSearchEmpty()->Bool{
+        return searchController.searchBar.text?.count == 0
+    }
+    func updateSearchResults(for searchController: UISearchController) {
+        let text = searchController.searchBar.text
+        if isSearchEmpty(){
+            tableView.reloadData()
+            return
+        }
+        filteredPartners = partners.filter({ (partner) -> Bool in
+            return partner.name.lowercased().contains(text!.lowercased())
+        })
+        tableView.reloadData()
+    }
+
 }

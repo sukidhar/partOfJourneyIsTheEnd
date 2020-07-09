@@ -21,14 +21,11 @@ class ChatViewController: UITableViewController {
     var partners = [Partner]()
     var db = Firestore.firestore()
     let checkers = Checkers()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        //let firstName = keychain.get("firstName")!
-        //let lastName = keychain.get("lastName")!
-        //change name here
         checkers.isGoingToBackground()
+ 
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         self.navigationItem.title = keychain.get("name")!
         tabBarController?.tabBar.isHidden = true
@@ -39,13 +36,7 @@ class ChatViewController: UITableViewController {
     
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -53,6 +44,7 @@ class ChatViewController: UITableViewController {
             goToLoginScreen()
         }
     }
+    
     
     func goToLoginScreen(){
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC")

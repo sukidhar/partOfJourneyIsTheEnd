@@ -56,7 +56,6 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
         NotificationCenter.default.addObserver(self, selector: #selector(loadUnisAgain(notification:)), name: NSNotification.Name("favChanges"), object: nil)
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         globalValues.universties = sb.unarchive(objectForKey: "wishlist") as? [String] ?? []
-        self.navigationController?.navigationBar.backgroundColor = #colorLiteral(red: 1, green: 0.6026306748, blue: 0, alpha: 1)
         // Do any additional setup after loading the view.
         favoritesCollectionView.delegate = self
         favoritesCollectionView.dataSource = self
@@ -80,16 +79,15 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
      
    @objc fileprivate func applicationIsActive() {
         canLogin()
-    guard let uid = DataService().keyChain.get("uid") else{
-        return
-    }
-    
-    OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-        print(bool)
-    }
+        DBAccessor.shared.goOnline()
     }
     override func viewDidAppear(_ animated: Bool) {
         canLogin()
+        self.navigationController?.navigationBar.isHidden = false
+        self.tabBarController?.tabBar.isHidden = false
+        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.9960784314, green: 0.5882352941, blue: 0, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        self.navigationItem.title = ""
     }
     
     func canLogin(){
@@ -100,10 +98,6 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.navigationBar.isHidden = false
-        self.tabBarController?.tabBar.isHidden = false
-    }
     
     func goToLoginScreen(){
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC")
@@ -119,18 +113,18 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
         if searchBar.isHidden {
             searchBar.isHidden = false
             if #available(iOS 13.0, *) {
-                sender.image = UIImage(systemName: "xmark")
                 searchBar.searchTextField.becomeFirstResponder()
             } else {
                 // Fallback on earlier versions
-                sender.image = #imageLiteral(resourceName: "xmark")
                 let textFieldInsideSearchBar = searchBar.value(forKey: "searchField") as? UITextField
                 textFieldInsideSearchBar?.becomeFirstResponder()
             }
+            self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(self.searchEnabled(_:))), animated: true)
+
         }
         else{
+            self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchEnabled(_:))), animated: true)
             searchBar.isHidden = true
-            sender.image = #imageLiteral(resourceName: "Group 1950")
             searchBar.endEditing(true)
             if #available(iOS 13.0, *) {
                 searchBar.searchTextField.text = ""
@@ -217,8 +211,7 @@ class FavouritesViewController: UIViewController,UICollectionViewDataSource, UIC
                             if departments == nil{
                                 departments = data["department "] as? [[String:String]]
                             }
-                            let loc = CLLocationCoordinate2D(latitude: latt, longitude: long)
-                            let newUni = UniversityModel(ID: doc.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title, coordinates: loc, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
+                            let newUni = UniversityModel(ID: doc.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title, longitude: long, lattitude:  latt, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
                             self.favorites.append(newUni)
                         }
                     }

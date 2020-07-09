@@ -11,6 +11,7 @@ import Firebase
 import KeychainSwift
 
 
+
 class ChatLogController: UICollectionViewController, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate {
     
     //MARK: - Variables
@@ -30,10 +31,12 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     // only if we have chat ID then fetch messages
     var chatID : String?{
         didSet{
+            displayMessages = []
            observeChat()
             didSetValues = true
         }
     }
+    var displayMessages = [NewMessage]()
     // just incase of message is 7 days old or lesser
     private var daysOfTheWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     let containerView = UIView()
@@ -92,12 +95,20 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         self.navigationItem.titleView = titleView
     }
     
-    struct NewMessage {
+    class NewMessage {
         let id : String
         let content : String
         let sender : String
-        let timeStamp : Double
+        var timeStamp : Double
         let recv : String
+        
+        init(id: String, content: String, sender: String, timeStamp: Double, recv: String){
+            self.id = id
+            self.content = content
+            self.timeStamp = timeStamp
+            self.recv = recv
+            self.sender = sender
+        }
     }
     
     
@@ -118,7 +129,6 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             chat.observe(.childAdded) { (snap) in
                 // just before leaving, this helps in knowing how many messages did user get in the first query, if its any less than actual query count, it means user doesnt have any old messages after that fetched count. but if the count == 50, then might be chance of having more messages.
                 defer{
-                    for i in self.chatMessages{print(i)}
                      let actualMessages = self.chatMessages.filter { (message) -> Bool in
                          return message.id != "dateChanged"
                      }
@@ -136,24 +146,10 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     let recv = messageData["recv"] as? String
                     let message = NewMessage(id: id, content: content.trimmingCharacters(in: .whitespacesAndNewlines)+" ", sender: sender, timeStamp: timestamp, recv: recv ?? "")
                     self.chatMessages.append(message)
-                    if self.chatMessages.count < 2 {
-                        //adds flag cells that show date on them
-                        let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
-                        self.chatMessages.insert(dateLabelingMessage, at: 0)
-                    }else {
-                        //adds flag cells that show date on them but the algo here is
-                        // -> if the message timestamp of new message is in date zone of the old message then just append it normally into the message array
-                        //->else add a flag cell just before that message
-                        
-                        if !(Date(timeIntervalSince1970: self.chatMessages[self.chatMessages.count-2].timeStamp/1000).shortDate == Date(timeIntervalSince1970: message.timeStamp/1000).shortDate)  {
-                            let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
-                            self.chatMessages.insert(dateLabelingMessage, at: self.chatMessages.count-1)
-                        }
-                    }
                     // reload and scroll to it
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
-                        self.collectionView.scrollToItem(at: IndexPath(item: self.chatMessages.count-1, section: 0), at: .bottom, animated: false)
+                        self.collectionView.scrollToItem(at: IndexPath(item: self.displayMessages.count-1, section: 0), at: .top, animated: false)
                     }
                 }
             }
@@ -184,25 +180,12 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     if let messageData = snap.value as? [String:Any]{
                         let id = snap.key
                         if id == mid{
-                           // reverse the array and append one by one into actual chat message collection taking care of date flag cells
                             let count = self.moreMessages.count
-                            self.moreMessages.reverse()
-                            for message in self.moreMessages{
-                                if Date(timeIntervalSince1970: message.timeStamp/1000).shortDate == Date(timeIntervalSince1970: self.chatMessages[1].timeStamp/1000).shortDate {
-                                    self.chatMessages.insert(message, at: 1)
-                                }else{
-                                    self.chatMessages.insert(message, at: 0)
-                                    let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: .nan, recv: "")
-                                    self.chatMessages.insert(dateLabelingMessage, at: 0)
-                                }
-                            }
+                            
+                            self.chatMessages.insert(contentsOf: self.moreMessages, at: 0)
                             // same check to see if we need to have access for another query
                             DispatchQueue.main.async {
                                 self.collectionView.reloadData()
-                                if count > 5
-                                {
-                                  self.collectionView.scrollToItem(at: IndexPath(item: count-1, section: 0), at: .bottom, animated: false)
-                                }
                                 if count < 99{
                                     NotificationCenter.default.post(name: NSNotification.Name("noreMoreMessages"), object: true)
                                 }else{
@@ -304,13 +287,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
 
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -326,12 +303,14 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkers.isGoingToBackground()
         NotificationCenter.default.addObserver(self, selector: #selector(shouldShowLoader), name: NSNotification.Name("loadingMessages"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shouldHideLoader(_ :)), name: NSNotification.Name("noreMoreMessages"), object: nil)
+        
         keyboardNotifications()
-        checkers.isGoingToBackground()
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         navigationController?.navigationBar.prefersLargeTitles = false
         self.additionalSafeAreaInsets.top = 30
@@ -410,11 +389,14 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         bottomConstraintForKeyboard.constant = -k + 10
         let s: TimeInterval = (i[UIResponder.keyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
         UIView.animate(withDuration: s) { self.view.layoutIfNeeded() }
-        DispatchQueue.main.async {
-            self.collectionView.scrollToItem(at: IndexPath(item: self.chatMessages.count-1, section: 0), at: .bottom, animated: true)
-        }
+        NotificationCenter.default.post(name: NSNotification.Name("KeyBoardDidShow"), object: nil)
     }
 
+    @objc func keyBoardDidShow(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + .microseconds(500)) {
+            self.collectionView.scrollToItem(at: IndexPath(item: self.displayMessages.count-1, section: 0), at: .top, animated: true)
+        }
+    }
     @objc func keyboardWillHide(sender: NSNotification) {
         let info = sender.userInfo!
         let s: TimeInterval = (info[UIResponder.keyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
@@ -435,6 +417,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             selector: #selector(keyboardWillHide),
             name: UIResponder.keyboardWillHideNotification,
             object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardDidShow), name: NSNotification.Name("KeyBoardDidShow"), object: nil)
     }
     
     
@@ -446,11 +429,43 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return chatMessages.count
+        if chatMessages.count == 0 {
+            return 0
+        }else if chatMessages.count == 1{
+            let message = chatMessages[0]
+            let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: message.timeStamp - 1, recv: "")
+            displayMessages = chatMessages
+            displayMessages.insert(dateLabelingMessage, at: 0)
+        }else{
+            displayMessages = []
+            let temp = chatMessages.sorted { (message1, message2) -> Bool in
+                return message1.timeStamp <= message2.timeStamp
+            }
+            var reversedSortedMessages : [NewMessage] = []
+            for message in temp{
+                reversedSortedMessages.insert(message, at: 0)
+            }
+            let message = reversedSortedMessages[0]
+            reversedSortedMessages.remove(at: 0)
+            let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: message.timeStamp - 1, recv: "")
+            displayMessages.append(message)
+            displayMessages.insert(dateLabelingMessage, at: 0)
+            for message in reversedSortedMessages{
+                if Date(timeIntervalSince1970: message.timeStamp/1000).shortDate == Date(timeIntervalSince1970: displayMessages[1].timeStamp/1000).shortDate {
+                        self.displayMessages.insert(message, at: 1)
+                        self.displayMessages[0].timeStamp = message.timeStamp
+                }else{
+                    self.displayMessages.insert(message, at: 0)
+                    let dateLabelingMessage = NewMessage(id: "dateChanged", content: self.cellContentForTimestamps(for : Date(timeIntervalSince1970: message.timeStamp/1000)), sender: "system", timeStamp: message.timeStamp, recv: "")
+                    self.displayMessages.insert(dateLabelingMessage, at: 0)
+                }
+            }
+        }
+        return displayMessages.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let message = chatMessages[indexPath.item]
+        let message = displayMessages[indexPath.item]
         if message.id == "dateChanged"{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
             for view in cell.subviews{
@@ -507,7 +522,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         status(cell: cell, message: message)
         cell.textView.isUserInteractionEnabled = false
         cell.textView.isScrollEnabled = false
-        cell.textViewWidthAncor?.constant = (estimateFrameForText(message.content).width < 32 ? 60 : estimateFrameForText(message.content).width) + 35
+        cell.textViewWidthAncor?.constant = (estimateFrameForText(message.content).width < 60 ? 60 : estimateFrameForText(message.content).width) + 35
         cell.textView.layer.cornerRadius = 18
         return cell
     }
@@ -542,10 +557,10 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if chatMessages[indexPath.item].id == "dateChanged"{
+        if displayMessages[indexPath.item].id == "dateChanged"{
             return CGSize(width: view.frame.width, height: 20)
         }
-        let height = estimateFrameForText(chatMessages[indexPath.item].content).height + 25
+        let height = estimateFrameForText(displayMessages[indexPath.item].content).height + 25
         
         return CGSize(width: view.frame.width, height: height + 15)
     }
@@ -573,6 +588,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         textViewHolder.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 16).isActive = true
         textViewHolder.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
         textViewHolder.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -25).isActive = true
+        textViewHolder.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -16).isActive = true
         
         textViewHolder.layer.borderWidth = 1
         textViewHolder.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
@@ -581,20 +597,22 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         collectionView.backgroundColor = #colorLiteral(red: 0.9764705882, green: 0.9764705882, blue: 0.9764705882, alpha: 1)
         
         let sendButton = UIButton(type: .system)
-        sendButton.setTitle("Send", for: .normal)
+        sendButton.setImage(#imageLiteral(resourceName: "Icon material-send"), for: .normal)
+        sendButton.tintColor = .black
+        sendButton.setImage(#imageLiteral(resourceName: "Icon material-send"), for: .selected)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
         containerView.addSubview(sendButton)
-        sendButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        sendButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -25).isActive = true
-        textViewHolder.rightAnchor.constraint(equalTo: sendButton.leftAnchor, constant: 0).isActive = true
+        sendButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        sendButton.rightAnchor.constraint(equalTo: textViewHolder.rightAnchor).isActive = true
+        sendButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        sendButton.bottomAnchor.constraint(equalTo: textViewHolder.bottomAnchor, constant: -5).isActive = true
+        
         
         textViewHolder.addSubview(inputTextView)
         inputTextView.leftAnchor.constraint(equalTo: textViewHolder.leftAnchor, constant: 8).isActive = true
         inputTextView.topAnchor.constraint(equalTo: textViewHolder.topAnchor, constant: 6).isActive = true
-        inputTextView.rightAnchor.constraint(equalTo: textViewHolder.rightAnchor, constant: 0).isActive = true
+        inputTextView.rightAnchor.constraint(equalTo: sendButton.leftAnchor, constant: -5).isActive = true
         inputTextView.bottomAnchor.constraint(equalTo: textViewHolder.bottomAnchor, constant: -6).isActive = true
         inputTextView.centerYAnchor.constraint(equalTo: textViewHolder.centerYAnchor, constant: 0).isActive = true
     }
@@ -620,6 +638,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                 return
             }
             text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            self.inputTextView.text = nil
             let ref = Database.database().reference().child("chats").child(id).childByAutoId()
             let timestamp = ServerValue.timestamp()
             let child = ["content" : text, "sender" : keychain.get("uid")!, "timestamp" : timestamp, "recv" : rUser!.id!, "senderName" : keychain.get("name")!] as [String : Any]
@@ -631,7 +650,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     self.present(alert, animated: true, completion: nil)
                     return
                 }
-                self.inputTextView.text = nil
+                
                 self.heightConstraintOfContainerView.constant = 75
                 self.updateUserChats(text: text, timestamp: timestamp)
                 self.updatePartnerChats(text: text, timestamp: timestamp)

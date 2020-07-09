@@ -10,21 +10,18 @@ import UIKit
 
 class CalendarViewController: UIViewController {
     var delegate : TabDelegate?
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkers.isGoingToBackground()
         self.navigationController?.navigationBar.backgroundColor = #colorLiteral(red: 1, green: 0.6026306748, blue: 0, alpha: 1)
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
     }
     
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+
     }
     override func viewDidAppear(_ animated: Bool) {
         canLogin()

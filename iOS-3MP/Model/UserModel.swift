@@ -15,4 +15,5 @@ class UserModel: NSObject {
     var email: String?
     var imageUrl: String?
     var type: String?
+    var course : String?
 }

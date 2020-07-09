@@ -31,7 +31,7 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </textView>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="questionLogo" translatesAutoresizingMaskIntoConstraints="NO" id="2y2-nl-lQU">
+                    <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="questionLogo" translatesAutoresizingMaskIntoConstraints="NO" id="2y2-nl-lQU">
                         <rect key="frame" x="10" y="10" width="30" height="30"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="30" id="DY6-CL-YHT"/>
@@ -39,7 +39,7 @@
                         </constraints>
                     </imageView>
                 </subviews>
-                <color key="backgroundColor" red="0.0" green="0.1526907988" blue="0.22812766879999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="LdH-Ot-csg" firstAttribute="leading" secondItem="2y2-nl-lQU" secondAttribute="trailing" constant="15" id="5Kc-06-1gj"/>
                     <constraint firstItem="2y2-nl-lQU" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="DEI-dy-mQW"/>

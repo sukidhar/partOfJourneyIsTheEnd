@@ -43,9 +43,11 @@ class ProfileViewController: UIViewController,UIImagePickerControllerDelegate, U
     var passCheck = false
     var matcher = false
     
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Checkers().isGoingToBackground()
+        checkers.isGoingToBackground()
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         setLabel(label: nameLabel, meta: "Name : ", data: keychain.get("name")!)
         setLabel(label: email, meta: "Email : ", data: keychain.get("email")!)
@@ -57,13 +59,7 @@ class ProfileViewController: UIViewController,UIImagePickerControllerDelegate, U
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -227,13 +223,13 @@ class ProfileViewController: UIViewController,UIImagePickerControllerDelegate, U
         })
     }
     
-    @IBAction func backPressed(_ sender: UIBarButtonItem) {
+    @IBAction func backPressed(_ sender: UIButton) {
         if imageChanged{
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) {
                 NotificationCenter.default.post(name: Notification.Name("imagePicked"), object: true)
             }
         }
-        self.dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     @IBAction func editPressed(_ sender: UIButton) {
         let image = UIImagePickerController()
@@ -306,17 +302,18 @@ class ProfileViewController: UIViewController,UIImagePickerControllerDelegate, U
                             return
                     }
                     if let metaUrl = url?.absoluteString{
-                        Firestore.firestore().collection("USER").document(self.keychain.get("uid")!).getDocument {(snap, error) in
+                            Database.database().reference().child("USER").child(self.keychain.get("uid")!).child("image").setValue(metaUrl)
+                            self.keychain.set(metaUrl, forKey: "profileImage")
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: NSNotification.Name("profileImageUploadedSuccessfully"), object: metaUrl)
+                            }
+                            Firestore.firestore().collection("USER").document(self.keychain.get("uid")!).getDocument {(snap, error) in
                             if let error = error {
                                 print(error.localizedDescription)
                                 return
                             }
                             snap?.reference.updateData(["imageUrl" : metaUrl])
-                            self.keychain.set(metaUrl, forKey: "profileImage")
-                            DispatchQueue.main.async {
-                                NotificationCenter.default.post(name: NSNotification.Name("profileImageUploadedSuccessfully"), object: metaUrl)
-                            }
-                            }
+                        }
                         }
                     }
                 })
@@ -324,4 +321,7 @@ class ProfileViewController: UIViewController,UIImagePickerControllerDelegate, U
         }
         dismiss(animated: true, completion: nil)
     }
+    
+    
+    
 }

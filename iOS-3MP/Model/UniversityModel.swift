@@ -10,13 +10,13 @@
 import UIKit
 import CoreLocation
 
-struct UniversityModel{
-//    var Ambassadors : [Int]
+struct UniversityModel : Codable{
     let ID : String
     let description : String?
     let imageURL : String
     let title : String
-    let coordinates : CLLocationCoordinate2D
+    let longitude : Double
+    let lattitude : Double
     let address : String
     let rawDept : [[String:String]]
     var Departments : [Department]

@@ -10,21 +10,17 @@ import UIKit
 
 class AboutUsViewController: UIViewController {
 
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Checkers().isGoingToBackground()
+        checkers.isGoingToBackground()
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         // Do any additional setup after loading the view.
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     override func viewDidAppear(_ animated: Bool) {
         canLogin()
@@ -41,8 +37,9 @@ class AboutUsViewController: UIViewController {
         self.view.window?.rootViewController = vc
         self.view.window?.makeKeyAndVisible()
     }
-    @IBAction func backButtonPressed(_ sender: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
+    @IBAction func backButtonPressed(_ sender: UIButton) {
+self.navigationController?.popViewController(animated: true)
+        
     }
     
     

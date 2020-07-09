@@ -14,14 +14,18 @@ class ContactUsViewController: UIViewController, MFMailComposeViewControllerDele
     @IBOutlet weak var heightOfTextView: NSLayoutConstraint!
     @IBOutlet weak var subjectField: UITextView!
     @IBOutlet weak var textField: UITextView!
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkers.isGoingToBackground()
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         subjectField.delegate = self
         // Do any additional setup after loading the view.
     }
     @objc fileprivate func applicationIsActive() {
         canLogin()
+        DBAccessor.shared.goOnline()
     }
     override func viewDidAppear(_ animated: Bool) {
         canLogin()
@@ -51,8 +55,8 @@ class ContactUsViewController: UIViewController, MFMailComposeViewControllerDele
         self.view.window?.makeKeyAndVisible()
     }
 
-   @IBAction func backButtonPressed(_ sender: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
+   @IBAction func backButtonPressed(_ sender: UIButton) {
+        self.navigationController?.popViewController(animated: true)
     }
     @IBAction func messageSendingButtonPressed(_ sender: UIButton) {
         if MFMailComposeViewController.canSendMail() {

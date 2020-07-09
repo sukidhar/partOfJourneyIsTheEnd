@@ -49,7 +49,7 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="University Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mpk-yB-Zh1">
-                                <rect key="frame" x="0.0" y="162" width="150" height="18"/>
+                                <rect key="frame" x="0.0" y="160" width="150" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -60,7 +60,7 @@
                             <constraint firstAttribute="trailing" secondItem="lCb-PD-RgC" secondAttribute="trailing" constant="10" id="2lm-ho-zco"/>
                             <constraint firstItem="Mpk-yB-Zh1" firstAttribute="leading" secondItem="6e3-Oo-Jdl" secondAttribute="leading" id="J58-ux-zJr"/>
                             <constraint firstItem="lCb-PD-RgC" firstAttribute="leading" secondItem="6e3-Oo-Jdl" secondAttribute="leading" constant="10" id="OTK-Bv-Z9h"/>
-                            <constraint firstAttribute="bottom" secondItem="Mpk-yB-Zh1" secondAttribute="bottom" constant="45" id="Qsm-lo-O5Z"/>
+                            <constraint firstItem="Mpk-yB-Zh1" firstAttribute="top" secondItem="lCb-PD-RgC" secondAttribute="bottom" constant="20" id="Vba-cp-dck"/>
                             <constraint firstItem="lCb-PD-RgC" firstAttribute="top" secondItem="6e3-Oo-Jdl" secondAttribute="top" constant="10" id="hN3-LU-JDU"/>
                             <constraint firstItem="Mpk-yB-Zh1" firstAttribute="centerX" secondItem="6e3-Oo-Jdl" secondAttribute="centerX" id="wvH-fo-jDp"/>
                         </constraints>

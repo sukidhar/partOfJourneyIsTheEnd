@@ -10,11 +10,14 @@ import UIKit
 
 class DepartmentCollectionViewCell: UICollectionViewCell {
 
+    @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var crestImage: UIImageView!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        mainView.layer.borderWidth = 1.0
+        mainView.layer.borderColor = UIColor.clear.cgColor
     }
 
 }

@@ -40,8 +40,11 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
     ]
     
     
+       let checkers = Checkers()
+        
         override func viewDidLoad() {
             super.viewDidLoad()
+            checkers.isGoingToBackground()
             faqTable.dataSource = self
             faqTable.delegate = self
             Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
@@ -51,6 +54,7 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
         }
         @objc fileprivate func applicationIsActive() {
             canLogin()
+            DBAccessor.shared.goOnline()
         }
         override func viewDidAppear(_ animated: Bool) {
             canLogin()
@@ -68,9 +72,10 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
             self.view.window?.rootViewController = vc
             self.view.window?.makeKeyAndVisible()
         }
-        @IBAction func backButtonPressed(_ sender: UIBarButtonItem) {
-            self.dismiss(animated: true, completion: nil)
-        }
+        @IBAction func backButtonPressed(_ sender: UIButton) {
+self.navigationController?.popViewController(animated: true)
+            
+    }
     
     
     
@@ -79,11 +84,17 @@ class FAQViewController: UIViewController , UITableViewDataSource,UITableViewDel
        let data = dataSource[indexPath.row]
        if !data.isAnswer{
            let cell = tableView.dequeueReusableCell(withIdentifier: "ResuableCell", for: indexPath) as! QuestionCell
-           cell.label.text = data.question
+            cell.label.text = data.question
+            cell.label.isUserInteractionEnabled = false
+            cell.backgroundColor = .clear
+            cell.selectionStyle = .none
            return cell
        }else{
            let cell = tableView.dequeueReusableCell(withIdentifier: "ReusableAnswerCell", for: indexPath) as! answerCell
-           cell.label.text = data.answer
+            cell.backgroundColor = .clear
+            cell.label.text = data.answer
+            cell.selectionStyle = .none
+            cell.label.isUserInteractionEnabled = false
            return cell
        }
     }

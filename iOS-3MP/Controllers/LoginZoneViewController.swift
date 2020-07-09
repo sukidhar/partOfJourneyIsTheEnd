@@ -265,6 +265,7 @@ class LoginZoneViewController: UIViewController {
                     self.keychain.set((docData["gender"] as? String) ?? "", forKey: "gender")
                     self.keychain.set((docData["profileImage"] as? String) ?? "", forKey: "profileImage")
                     self.keychain.set((docData["isAmbassador"] as? Bool) ?? false, forKey: "isAmbassador")
+                    self.keychain.set((docData["isExpert"] as? Bool) ?? false,forKey: "isExpert")
                     self.keychain.set((docData["name"] as? String) ?? "", forKey: "name")
                     self.keychain.set((docData["phone"] as? String) ?? "", forKey: "phone")
                     self.keychain.set( data?["currentInstitute"] as? String ?? "nil", forKey: "institute")
@@ -276,7 +277,8 @@ class LoginZoneViewController: UIViewController {
                     self.keychain.set(nameComponents[0], forKey: "firstName")
                     self.keychain.set(nameComponents[1], forKey: "lastName")
                     self.setFcmToken()
-                    if self.keychain.getBool("isAmbassador")!{
+                    
+                    if self.keychain.getBool("isAmbassador")! || self.keychain.getBool("isExpert")!{
                         let vc1 = self.storyboard?.instantiateViewController(withIdentifier: "HomeView") as! UINavigationController
                         let uniVC = self.storyboard?.instantiateViewController(withIdentifier: "UniversityPage") as! UniversityViewController
                            let data = Strongbox().unarchive(objectForKey: "data") as! [String:Any]
@@ -294,9 +296,13 @@ class LoginZoneViewController: UIViewController {
                                            if departments == nil{
                                                departments = data["department "] as? [[String:String]]
                                            }
-                                           let loc = CLLocationCoordinate2D(latitude: latt, longitude: long)
-                                           let newUni = UniversityModel(ID: snap!.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title, coordinates: loc, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
+                                          
+                                        let newUni = UniversityModel(ID: snap!.documentID, description: data["description"] as? String, imageURL: data["image"] as? String ?? "" , title: title, longitude: long, lattitude: latt, address: "", rawDept: departments ?? [[:]], Departments: [Department](), FAQ: data["FAQ link"] as? String ?? "", logo: data["logo"] as? String ?? "", videoURL: data["video"] as? String ?? "")
                                            uniVC.university = newUni
+                                        
+                                            let encoder = JSONEncoder()
+                                            let encodedUniversity = try? encoder.encode(newUni)
+                                        UserDefaults.standard.set(encodedUniversity, forKey: "ambassadorUniversity")
                                            let vc2 = UINavigationController(rootViewController: uniVC)
                                            self.homeViewController.viewControllers = [vc1,vc2] as [UIViewController]
                                            self.homeViewController.tabBar.items?[1].image = #imageLiteral(resourceName: "Icon awesome-university").resize(25 , 25)

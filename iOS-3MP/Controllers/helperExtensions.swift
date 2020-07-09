@@ -233,12 +233,15 @@ class Checkers
     }
     @objc func willResignActive(_ notification: Notification) {
         if let uid = DataService().keyChain.get("uid"){
-            OnlineOfflineService.online(for: uid, status: "offline") { (bool) in
-                print("offline",bool)
+            if status == "online"{
+                OnlineOfflineService.online(for: uid, status: "offline") { (bool) in
+                    if bool{
+                        status = "offline"
+                    }
+                }
             }
         }
     }
-
 }
 protocol TabDelegate {
     func passIndex(_ viewController : UIViewController, index : Int)
@@ -274,7 +277,6 @@ struct OnlineOfflineService {
     static func online(for uid: String, status: String, success: @escaping (Bool) -> Void) {
         let onlinesRef = Database.database().reference().child("USER").child(uid).child("status")
         onlinesRef.setValue(status) {(error, _ ) in
-
             if let error = error {
                 assertionFailure(error.localizedDescription)
                 success(false)
@@ -315,3 +317,5 @@ extension UIImage {
         return newImage
     }
 }
+
+

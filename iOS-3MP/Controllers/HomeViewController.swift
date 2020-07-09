@@ -10,7 +10,8 @@ import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 import KeychainSwift
-
+import SDWebImage
+import Strongbox
 
 class HomeViewController: UIViewController,
     UITableViewDataSource,
@@ -18,6 +19,7 @@ class HomeViewController: UIViewController,
     
     @IBOutlet weak var tableView: UITableView!
     
+    let sb = Strongbox()
     
     let keychain = DataService().keyChain
     var db = Firestore.firestore()
@@ -26,30 +28,34 @@ class HomeViewController: UIViewController,
     var clickedPath: IndexPath? = nil
     
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isTranslucent = false
+        self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.navigationItem.largeTitleDisplayMode = .automatic
+        self.navigationItem.title = ""
+        self.tabBarController?.tabBar.isHidden = false
+        self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.9960784314, green: 0.5882352941, blue: 0, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+    }
+    
     var imagePicker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        globalValues.universties = sb.unarchive(objectForKey: "wishlist") as? [String] ?? []
         self.navigationController?.navigationBar.isHidden = false
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.tabBarController?.tabBar.isHidden = false
-        self.navigationController?.hidesBottomBarWhenPushed = false
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        //navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Menu", style: .done, target: self, action: #selector(pushFromLeftBarButtonItemTapped))
-//        loadPosts()
-//        for post in posts{
-//            print("\(post.content)")
-//        }
-//        self.tableView.dataSource = self
-//        self.tableView.delegate = self
+        loadPosts()
+        //print("Universities-")
+        //print(globalValues.universties)
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        self.tableView.estimatedRowHeight = 210
+        self.tableView.rowHeight = UITableView.automaticDimension
         
        
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.hidesBottomBarWhenPushed = false
-        self.tabBarController?.tabBar.isHidden = false
-        self.navigationController?.navigationBar.isHidden = false
     }
     
     @IBAction func showPhotos(_ sender: Any) {
@@ -99,7 +105,6 @@ class HomeViewController: UIViewController,
         self.navigationController?.pushViewControllerFromLeft(controller: viewController)
     }
     
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -133,31 +138,37 @@ class HomeViewController: UIViewController,
                 
                 newPost = posts[indexPath.row]
             }
-            if(newPost.content!.count > 40)
+            cell.postCellDelegate = self
+            let imageTap = UITapGestureRecognizer(target: self, action: #selector(self.didTapImage))
+            
+            cell.postImage.addGestureRecognizer(imageTap)
+            
+            if newPost.userId == keychain.get("uid")
             {
-                let str1 = String(newPost.content!.prefix(37))
-                let str2 = "....."
-//                cell.tapForMoreImg.isHidden = false
-                cell.tapForMoreButton.isHidden = false
+                cell.moreButton.isHidden = false
+            }
+            
+            cell.id = newPost.id!
+            if(newPost.image != nil)
+            {
                 
-                cell.postText.text = "\(str1) \(str2)"
-                let collectionRef = db.collection("USER")
-                collectionRef.getDocuments { (querySnapshot, err) in
-                    if let docs = querySnapshot?.documents {
-                        for docSnapshot in docs {
-                            do{
-                                if newPost.userId == docSnapshot.documentID{
-                                    cell.authorName.text = docSnapshot.data()["name"] as? String
-                                }
-                            }
-                         }
-                    }
-                }
-                //cell.authorName.text = newPost.userId
-                cell.likeCount.text = String(newPost.likes!)
-                cell.postCellDelegate = self
-                //cell.delegate = self
-            } else {
+                cell.postImage.isHidden = false
+                cell.postImageheightConstraint.constant = 77.0
+                
+                let pic = newPost.image
+                let url = URL(string: pic!)
+                
+                cell.postImage.layer.cornerRadius = 10
+                cell.postImage.layer.borderWidth = 3
+                cell.postImage.layer.borderColor = UIColor.white.cgColor
+                
+                cell.postImage.sd_setImage(with: url, completed: nil)
+            }
+            else{
+                cell.postImage.isHidden = true
+                cell.postImageheightConstraint.constant = 0
+            }
+            cell.likes = newPost.likes!
                 cell.postText.text = newPost.content
                 let collectionRef = db.collection("USER")
                 collectionRef.getDocuments { (querySnapshot, err) in
@@ -172,23 +183,70 @@ class HomeViewController: UIViewController,
                     }
                 }
                 //cell.authorName.text = newPost.userId
-                cell.likeCount.text = String(newPost.likes!)
-            }
+                //cell.likeCount.text = String(newPost.likes!)
+            //}
             return cell
         }
+    }
+    
+    @objc func didTapImage(sender: UITapGestureRecognizer){
+        let imageView = sender.view as! UIImageView
+        let newImageView = UIImageView(image: imageView.image)
+        
+        newImageView.frame = self.view.frame
+        
+        newImageView.backgroundColor = UIColor.black
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.isUserInteractionEnabled = true
+        
+        let tap = UITapGestureRecognizer(target:self,action:#selector(self.dismissFullScreenImage))
+        
+        newImageView.addGestureRecognizer(tap)
+        self.view.addSubview(newImageView)
+        
+    }
+    
+    @objc func dismissFullScreenImage(sender:UITapGestureRecognizer)
+    {
+        sender.view?.removeFromSuperview()
     }
     
     func viewFullPost(_ cell: PostTableViewCell) {
         //print("tapForMoreTappedInHome")
         if let indexPath = self.tableView.indexPath(for: cell) {
             clickedPath = indexPath
-            performSegue(withIdentifier: "viewFullPost", sender: self)
+            let postVC = self.storyboard?.instantiateViewController(withIdentifier: "EditPostViewController") as! EditPostViewController
+            var selectedIndex = posts[0]
+            if keychain.getBool("isAmbassador")!{
+                selectedIndex = posts[indexPath.row-1]
+            }
+            else{
+                selectedIndex = posts[indexPath.row]
+            }
+            if selectedIndex.content != nil{
+                postVC.postContent = selectedIndex.content!
+            }
+            else {
+                postVC.postContent = ""
+            }
+            
+            if selectedIndex.title != nil {
+                postVC.posTitle = selectedIndex.title!
+            }
+            if selectedIndex.image != nil {
+                postVC.imageURL = selectedIndex.image!
+            }
+            else {
+                postVC.imageURL = ""
+            }
+            postVC.id = selectedIndex.id!
+            self.navigationController?.pushViewController(postVC, animated: true)
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "viewFullPost" {
-            let postVC = segue.destination as! FullPostViewController
+        if segue.identifier == "editSegue" {
+            let postVC = segue.destination as! EditPostViewController
             if let indexPath = clickedPath {
                 // get the row
                 // access the posts data
@@ -199,9 +257,30 @@ class HomeViewController: UIViewController,
                 else{
                     selectedIndex = posts[indexPath.row]
                 }
-                postVC.postContent = selectedIndex.content!
-                postVC.userName = selectedIndex.userName!
-                postVC.likes = selectedIndex.likes!
+                
+                if selectedIndex.content != nil{
+                    postVC.postContent = selectedIndex.content!
+                }
+                else {
+                    postVC.postContent = ""
+                }
+                
+                if selectedIndex.title != nil {
+                    postVC.posTitle = selectedIndex.title!
+                }
+                else {
+                    postVC.posTitle = ""
+                }
+                
+                if selectedIndex.image != nil {
+                    postVC.imageURL = selectedIndex.image!
+                }
+                else {
+                    postVC.imageURL = ""
+                }
+                postVC.id = selectedIndex.id!
+//                postVC.userName = selectedIndex.userName!
+//                postVC.likes = selectedIndex.likes!
             }
         }
     }
@@ -210,7 +289,7 @@ class HomeViewController: UIViewController,
         if indexPath.row == 0 {
             return 300
         } else {
-            return 210
+            return UITableView.automaticDimension
         }
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -226,21 +305,30 @@ class HomeViewController: UIViewController,
     
     func loadPosts(){
         // load posts, i.e Posts from database
-        let collectionRef = db.collection("posts")
+        let collectionRef = db.collection("posts").order(by: "createdAt", descending: true)
                           collectionRef.getDocuments { (querySnapshot, err) in
                               if let docs = querySnapshot?.documents {
                                   for docSnapshot in docs {
-                                      defer{
+                                    do{
                                         let newPost = PostModel()
+                                        newPost.id = docSnapshot.documentID
                                         if docSnapshot.data()["content"] != nil{
                                                 newPost.content = (docSnapshot.data()["content"] as! String)
                                         }
                                         else{
-                                            newPost.content = (docSnapshot.data()["title"] as! String)
+                                            newPost.content = ""
                                         }
                                         newPost.title = (docSnapshot.data()["title"] as! String)
                                         newPost.userId = (docSnapshot.data()["userId"] as! String)
                                         newPost.universityID = (docSnapshot.data()["universityId"] as! String)
+                                        if docSnapshot.data()["files"] != nil{
+                                            let imageArray = docSnapshot.data()["files"]! as! [Any]
+                                            //print(imageArray[0])
+                                            newPost.image = (imageArray[0] as! String)
+                                        }
+                                        else{
+                                            newPost.image = nil
+                                        }
                                         if docSnapshot.data()["likeCount"] != nil{
                                                 newPost.likes = (docSnapshot.data()["likeCount"] as! Int)
                                         }
@@ -260,7 +348,11 @@ class HomeViewController: UIViewController,
                                                  }
                                             }
                                         }
-                                        self.posts.append(newPost)
+                                        
+                                        if(globalValues.universties.contains(newPost.universityID!))
+                                        {
+                                            self.posts.append(newPost)
+                                        }
                                        
                                    DispatchQueue.main.async {
                                        self.tableView.reloadData()
@@ -285,7 +377,7 @@ extension UINavigationController {
         transition.type = CATransitionType.push
         transition.subtype = CATransitionSubtype.fromLeft
         transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        view.window?.layer.add(transition,forKey: kCATransition)
+        view.window!.layer.add(transition,forKey: kCATransition)
         pushViewController(controller, animated: false)
     }
     
@@ -298,7 +390,26 @@ extension UINavigationController {
         transition.type = CATransitionType.push
         transition.subtype = CATransitionSubtype.fromRight
         transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        view.window?.layer.add(transition,forKey: kCATransition)
+        view.window!.layer.add(transition,forKey: kCATransition)
         popViewController(animated: false)
     }
 }
+
+extension UITableViewCell{
+    func shadowAndBorderForCell(yourTableViewCell : UITableViewCell){
+            // SHADOW AND BORDER FOR CELL
+            //yourTableViewCell.contentView.layer.cornerRadius = 5
+            yourTableViewCell.contentView.layer.borderWidth = 0.5
+            yourTableViewCell.contentView.layer.borderColor = UIColor.lightGray.cgColor
+            yourTableViewCell.contentView.layer.masksToBounds = true
+            yourTableViewCell.layer.shadowColor = UIColor.gray.cgColor
+            yourTableViewCell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            yourTableViewCell.layer.shadowRadius = 2.0
+            yourTableViewCell.layer.shadowOpacity = 1.0
+            yourTableViewCell.layer.masksToBounds = false
+            yourTableViewCell.layer.shadowPath = UIBezierPath(roundedRect:yourTableViewCell.bounds, cornerRadius:yourTableViewCell.contentView.layer.cornerRadius).cgPath
+            }
+}
+
+
+

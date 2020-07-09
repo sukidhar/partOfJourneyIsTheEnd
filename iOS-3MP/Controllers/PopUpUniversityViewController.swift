@@ -11,6 +11,10 @@ import WebKit
 import youtube_ios_player_helper
 
 class PopUpUniversityViewController: UIViewController{
+    @IBOutlet weak var heightOfEntireCard: NSLayoutConstraint!
+    @IBOutlet weak var heightOfDescriptionHolder: NSLayoutConstraint!
+    @IBOutlet weak var heightOfDescription: NSLayoutConstraint!
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var handleImage: UIImageView!
     @IBOutlet weak var handleImage2: UIImageView!
     @IBOutlet weak var chatButton : UIButton!
@@ -25,22 +29,19 @@ class PopUpUniversityViewController: UIViewController{
     @IBOutlet weak var departmentCollectionView : UICollectionView!
     
     var university : UniversityModel?
+    let checkers = Checkers()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Checkers().isGoingToBackground()
+        checkers.isGoingToBackground()
+        
         Observers.shared.addObservers(for: self, with: #selector(applicationIsActive))
         handleBar.layer.cornerRadius = handleBar.frame.height/2
     }
 
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -53,11 +54,6 @@ class PopUpUniversityViewController: UIViewController{
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "LoginVC")
         self.view.window?.rootViewController = vc
         self.view.window?.makeKeyAndVisible()
-    }
-    @IBAction func chatButtonPressed(_ sender: UIButton) {
-       
-    }
-    @IBAction func explorePressed(_ sender: UIButton) {
     }
 }
 

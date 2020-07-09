@@ -10,7 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="deptCell" id="gTV-IL-0wX" customClass="DepartmentCollectionViewCell" customModule="iOS_3MP" customModuleProvider="target">
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="deptCell" id="gTV-IL-0wX" customClass="DepartmentCollectionViewCell" customModule="eduMates" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="108" height="206"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -41,6 +41,12 @@
                             <constraint firstItem="Kjx-vJ-Vsb" firstAttribute="leading" secondItem="O2l-cf-qvd" secondAttribute="leading" id="hAm-do-JQU"/>
                             <constraint firstAttribute="trailing" secondItem="Kjx-vJ-Vsb" secondAttribute="trailing" id="uzn-d6-S6n"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="15"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                 </subviews>
             </view>
@@ -54,6 +60,7 @@
             <size key="customSize" width="108" height="206"/>
             <connections>
                 <outlet property="crestImage" destination="Kjx-vJ-Vsb" id="a5q-AL-sU1"/>
+                <outlet property="mainView" destination="O2l-cf-qvd" id="bD1-hK-JiN"/>
                 <outlet property="titleLabel" destination="C9V-I1-8y5" id="rxM-d8-qzl"/>
             </connections>
             <point key="canvasLocation" x="-46.376811594202906" y="30.803571428571427"/>

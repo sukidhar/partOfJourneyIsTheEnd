@@ -13,11 +13,10 @@ import Strongbox
 
 class SideViewController: UIViewController {
 
-    
+    var notGoingToHome : Bool?
     @IBOutlet weak var heightOfHidableViews: NSLayoutConstraint!
     @IBOutlet weak var wishlistIcon: UIImageView!
     @IBOutlet weak var searchIcon: UIImageView!
-    @IBOutlet weak var calendarGroupIcon: UIImageView!
     @IBOutlet weak var aboutEdumatesICon: UIImageView!
     @IBOutlet weak var newsfeedIcon: UIImageView!
     @IBOutlet weak var accountSettingsView: UIView!
@@ -25,10 +24,8 @@ class SideViewController: UIViewController {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var newsFeedText: UILabel!
     @IBOutlet weak var newsFeedButton: UIButton!
-    @IBOutlet weak var CalendarButton: UIButton!
     @IBOutlet weak var accountSettingsButton: UIButton!
     @IBOutlet weak var aboutEdumates: UILabel!
-    @IBOutlet weak var calendarText: UILabel!
     @IBOutlet weak var discovetText: UILabel!
     @IBOutlet weak var wishListText: UILabel!
     @IBOutlet weak var aboutUs: UIButton!
@@ -39,16 +36,19 @@ class SideViewController: UIViewController {
     let keychain = DataService().keyChain
     var accountSettingsPressed = false
     var index : Int?
+    let checkers = Checkers()
+    
+    
     override func viewDidLoad() {
-        Checkers().isGoingToBackground()
+        super.viewDidLoad()
+        checkers.isGoingToBackground()
         NotificationCenter.default.addObserver(self, selector: #selector(updateImage(notification:)), name: NSNotification.Name("profileImageUploadedSuccessfully"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(startActivityIndicator(notification:)), name: NSNotification.Name("imagePicked"), object: nil)
-        super.viewDidLoad()
+       
         self.tabBarController?.tabBar.isHidden = true
         self.navigationController?.navigationBar.isHidden = true
         self.newsFeedButton.layer.cornerRadius = 12
         self.discoverButton.layer.cornerRadius = 12
-        self.CalendarButton.layer.cornerRadius = 12
         self.wishlistButton.layer.cornerRadius = 12
         index = self.tabBarController?.selectedIndex
         if index != nil {
@@ -79,16 +79,13 @@ class SideViewController: UIViewController {
         newsFeedButton.backgroundColor = .none
         discoverButton.backgroundColor = .none
         wishlistButton.backgroundColor = .none
-        CalendarButton.backgroundColor = .none
         FAQ.titleLabel?.textColor = .white
         newsFeedText.textColor = .white
-        calendarText.textColor = .white
         discovetText.textColor = .white
         wishListText.textColor = .white
-        newsfeedIcon.image = #imageLiteral(resourceName: "Group-1916")
-        calendarGroupIcon.image = #imageLiteral(resourceName: "calendar-dates")
+        newsfeedIcon.tintColor = .white
         searchIcon.image = #imageLiteral(resourceName: "Group 1950")
-        wishlistIcon.image = #imageLiteral(resourceName: "MenuWishListIcon")
+        wishlistIcon.tintColor = .white
         
         guard let isAmb = keychain.getBool("isAmbassador") else{
             return
@@ -96,21 +93,18 @@ class SideViewController: UIViewController {
         if isAmb{
             wishListText.text = "My University"
             heightOfHidableViews.constant = 0
-            calendarText.isHidden = true
             discovetText.isHidden = true
-            calendarGroupIcon.isHidden = true
             discoverButton.isHidden = true
-            CalendarButton.isHidden = true
             searchIcon.isHidden = true
             switch index {
             case 0:
                 newsFeedButton.backgroundColor = .white
                 newsFeedText.textColor = .black
-                newsfeedIcon.image = #imageLiteral(resourceName: "Group 1916")
+                newsfeedIcon.tintColor = .black
             case 1 :
                 wishlistButton.backgroundColor = .white
                 wishListText.textColor = .black
-                wishlistIcon.image = #imageLiteral(resourceName: "iconForTabWIshList")
+                wishlistIcon.image = #imageLiteral(resourceName: "Icon awesome-university").resize(20, 20)
             default:
                 print("unknown index")
             }
@@ -120,25 +114,21 @@ class SideViewController: UIViewController {
             case 0:
                 newsFeedButton.backgroundColor = .white
                 newsFeedText.textColor = .black
-                newsfeedIcon.image = #imageLiteral(resourceName: "Group 1916")
+                newsfeedIcon.tintColor = .black
             case 1:
                 discoverButton.backgroundColor = .white
                 discovetText.textColor = .black
-                searchIcon.image = #imageLiteral(resourceName: "searchtb")
+                searchIcon.image =  #imageLiteral(resourceName: "Group 1950-1")
             case 2:
                 wishlistButton.backgroundColor = .white
                 wishListText.textColor = .black
-                wishlistIcon.image = #imageLiteral(resourceName: "iconForTabWIshList")
-            case 3:
-                CalendarButton.backgroundColor = .white
-                calendarText.textColor = .black
-                calendarGroupIcon.image = #imageLiteral(resourceName: "calendar")
+                wishlistIcon.tintColor = .black
             default:
                 print("Unknown Button")
         }
     }
     override func viewWillAppear(_ animated: Bool) {
-        
+        notGoingToHome = false
         accountSettingsView.isHidden = true
         accountSettingsHeightConstraint.constant = 0
         nameLabel.text = keychain.get("name") ?? ""
@@ -156,18 +146,9 @@ class SideViewController: UIViewController {
         self.loadTabBarController(atIndex: 1)
     }
     
-    @IBAction func calendarButtonTapped(_ sender: Any) {
-        self.loadTabBarController(atIndex: 3)
-    }
     @objc fileprivate func applicationIsActive() {
         canLogin()
-        guard let uid = DataService().keyChain.get("uid") else{
-            return
-        }
-        
-        OnlineOfflineService.online(for: uid, status: "online") { (bool) in
-            print(bool)
-        }
+        DBAccessor.shared.goOnline()
     }
     func canLogin(){
         if Checkers().dateObserver()  < 0 {
@@ -183,7 +164,7 @@ class SideViewController: UIViewController {
     }
     @IBAction func accountSettingsButtonPressed(_ sender: UIButton){
         accountSettingsPressed = !accountSettingsPressed
-        accountSettingsHeightConstraint.constant = accountSettingsPressed ? 120 : 0
+        accountSettingsHeightConstraint.constant = accountSettingsPressed ? 100 : 0
         accountSettingsView.isHidden = !accountSettingsPressed
         aboutUs.isHidden = accountSettingsView.isHidden
         contactUs.isHidden = accountSettingsView.isHidden
@@ -210,17 +191,14 @@ class SideViewController: UIViewController {
 
     //function that will trigger the **MODAL** segue
     private func loadTabBarController(atIndex: Int){
+        if self.tabBarController?.selectedIndex == atIndex{
+            self.navigationController?.popToRootViewController(animated: true)
+            return
+        }
         self.tabBarController?.selectedIndex = atIndex
-        self.navigationController?.popToRootViewController(animated: true)
+        self.dismiss(animated: true, completion: nil)
     }
 
-    //in here you set the index of the destination tab and you are done
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//         if segue.identifier == "showTabBar" {
-//             let tabbarController = segue.destination as! UITabBarController
-//             tabbarController.selectedIndex = self.tabBarIndex!
-//         }
-//    }
     @IBAction func LogoutPressed(_ sender: UIButton) {
         let alert = UIAlertController(title: "Log out", message: "Are you sure to log out?", preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { (action) in
@@ -231,5 +209,30 @@ class SideViewController: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert,animated: true)
+    }
+    @IBAction func ContactUsPressed(_ sender: UIButton) {
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ContactUsViewController") as! ContactUsViewController
+        notGoingToHome = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    @IBAction func aboutUsPressed(_ sender: UIButton) {
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "AboutUsViewController") as! AboutUsViewController
+        notGoingToHome = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @IBAction func FAQpressed(_ sender: UIButton) {
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FAQViewController") as! FAQViewController
+        notGoingToHome = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        if let bool = notGoingToHome{
+            if !bool{
+                self.navigationController?.popToRootViewController(animated: true)
+                return
+            }
+        }
+        return
     }
 }

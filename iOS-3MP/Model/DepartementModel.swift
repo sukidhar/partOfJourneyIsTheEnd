@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Department {
+struct Department : Codable {
     var name : String
     var link : String
 }
